@@ -1,0 +1,3 @@
+[gd_scene format=3 uid="uid://cgi45f5uepd87"]
+
+[node name="2dMinimap" type="Node2D"]
