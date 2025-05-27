@@ -13,6 +13,8 @@ var start_position: Vector3
 var end_position: Vector3
 var moving: bool = false
 
+
+
 func try_move(dx: int, dy: int) -> bool:
 	if moving:
 		return false
@@ -32,7 +34,13 @@ func try_move(dx: int, dy: int) -> bool:
 	end_position = Vector3(grid_x, 0, grid_y)
 	move_elapsed = 0.0
 	moving = true
-	print("→ Moving from ", start_position, " to ", end_position)
+	print("Moving from ", start_position, " to ", end_position)
+	
+	var minimap = get_tree().get_root().get_node("Main/UI/2dMinimap")
+	if minimap:
+		minimap.set_player_pos(Vector2i(grid_x, grid_y), facing)
+	else:
+		print("Minimap not found, dumbass. You gave me: ", minimap)
 
 	return true
 	
@@ -41,6 +49,8 @@ func turn(direction):
 	if facing < 0:
 		facing += 4
 	target_rotation_y = facing * 90.0
+	var minimap = get_tree().get_root().get_node("Main/UI/2dMinimap")
+	minimap.set_player_pos(Vector2i(grid_x, grid_y), facing)
 	print("Now facing: ", facing)
 	
 func take_damage(amount):

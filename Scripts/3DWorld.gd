@@ -4,11 +4,13 @@ extends Node3D
 @export var wall_tile:  PackedScene
 @export var water_tile: PackedScene
 @export var player_entity: PackedScene
+@export var minimap_path: NodePath
 @onready var tile_root   = $TileRoot
 @onready var entity_root = $EntityRoot
 
 var map = MapGenerator.drunken_walk(2400)
 var spawn_tiles = []
+var player : Node3D
 
 func generate_map():
 	spawn_tiles.clear()
@@ -30,7 +32,7 @@ func generate_map():
 			tile_root.add_child(tile)
 
 func spawn_player():
-	var player = player_entity.instantiate()
+	player = player_entity.instantiate()
 	
 	var random = RandomNumberGenerator.new()
 	random.randomize()
@@ -48,6 +50,10 @@ func spawn_player():
 func _ready() -> void:
 	generate_map() # TODO: Take two inputs, map_type and steps
 	spawn_player()
+	var minimap = get_node(minimap_path)
+	print(minimap)
+	minimap.set_map_data(map)
+	minimap.set_player_pos(Vector2i(player.grid_x, player.grid_y), player.facing)
 
 ## Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta: float) -> void:

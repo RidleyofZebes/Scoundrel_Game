@@ -1,3 +1,38 @@
-[gd_scene format=3 uid="uid://bggiovw11xcc2"]
+[gd_scene load_steps=2 format=3 uid="uid://bggiovw11xcc2"]
 
-[node name="LogBox" type="Node2D"]
+[ext_resource type="FontFile" uid="uid://dxi5ehx81n7ss" path="res://Assets/Alkhemikal.ttf" id="1_1rf6y"]
+
+[node name="LogBoxMargin" type="MarginContainer"]
+clip_contents = true
+custom_minimum_size = Vector2(0, 150)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -150.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="LogBox" type="Panel" parent="."]
+layout_mode = 2
+
+[node name="TextMargin" type="MarginContainer" parent="LogBox"]
+layout_mode = 2
+offset_right = 1152.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
+
+[node name="LogBoxContents" type="RichTextLabel" parent="LogBox/TextMargin"]
+layout_mode = 2
+theme_override_fonts/normal_font = ExtResource("1_1rf6y")
+theme_override_font_sizes/normal_font_size = 32
+text = "You venture forth into the void...!"

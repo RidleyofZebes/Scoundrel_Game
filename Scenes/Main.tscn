@@ -1,3 +1,34 @@
-[gd_scene format=3 uid="uid://bx2nx6e61w0ws"]
+[gd_scene load_steps=3 format=3 uid="uid://bx2nx6e61w0ws"]
+
+[ext_resource type="PackedScene" uid="uid://ceudj14pim2r6" path="res://Scenes/UI Elements/3DWorld.tscn" id="1_r150o"]
+[ext_resource type="PackedScene" uid="uid://b7tjg7try5a3n" path="res://Scenes/UI.tscn" id="2_idj7w"]
 
 [node name="Main" type="Node3D"]
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+
+[node name="3dWorld" parent="SubViewportContainer/SubViewport" instance=ExtResource("1_r150o")]
+minimap_path = NodePath("../../../UI/2dMinimap")
+
+[node name="UI" parent="." instance=ExtResource("2_idj7w")]
+
+[node name="2dMinimap" parent="UI" index="0" node_paths=PackedStringArray("tilemap_layer", "entities_layer")]
+tilemap_layer = NodePath("Node2D/TileMapLayer")
+entities_layer = NodePath("Node2D/Entities")
+
+[editable path="SubViewportContainer/SubViewport/3dWorld"]
+[editable path="UI"]
+[editable path="UI/2dMinimap"]
