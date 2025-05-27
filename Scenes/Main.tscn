@@ -29,6 +29,9 @@ minimap_path = NodePath("../../../UI/2dMinimap")
 tilemap_layer = NodePath("Node2D/TileMapLayer")
 entities_layer = NodePath("Node2D/Entities")
 
+[node name="Node2D" parent="UI/2dMinimap" index="0"]
+scale = Vector2(0.5, 0.5)
+
 [editable path="SubViewportContainer/SubViewport/3dWorld"]
 [editable path="UI"]
 [editable path="UI/2dMinimap"]

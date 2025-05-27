@@ -41,7 +41,7 @@ func draw_minimap():
 			
 func center_minimap_on_player():
 	var tile_size = tilemap_layer.tile_set.tile_size
-	var minimap_size = Vector2(256, 256)
+	var minimap_size = Vector2(512, 512)
 	
 	var center_pixel = minimap_size / 2
 	var player_pixel_pos = tilemap_layer.map_to_local(player_grid_pos)
@@ -58,6 +58,7 @@ func update_entities():
 	var player_icon = Sprite2D.new()
 	player_icon.texture = preload("res://Assets/player.png")
 	player_icon.position = tilemap_layer.map_to_local(player_grid_pos)
+	# Rotation bandaid:
 	var minimap_facing = player_facing
 	if minimap_facing == 1:
 		minimap_facing = 3
