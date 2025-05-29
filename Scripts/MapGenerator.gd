@@ -1,5 +1,15 @@
 extends Node
 
+func void_platform(radius):
+	var map := []
+	for y in range(radius):
+		var row := []
+		for x in range (radius):
+			row.append(1)
+		map.append(row)
+	return map
+	
+
 func drunken_walk(step_target: int) -> Array:
 	# We'll return a 2D grid with the path marked as 1
 	var map := []

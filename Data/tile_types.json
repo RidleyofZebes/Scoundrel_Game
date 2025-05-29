@@ -17,7 +17,7 @@
 	"name": "Stone Wall",
 	"icon": "stone_wall",
 	"examine": "The stone wall is bare save for a scattering of mosses and lichen in the occasional crack.",
-	"color": [64, 64, 64],
+	"color": [48, 48, 48],
 	"isWall": 1
   },
   "3": {

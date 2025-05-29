@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://b7tjg7try5a3n"]
+
+[ext_resource type="PackedScene" uid="uid://cgi45f5uepd87" path="res://Scenes/UI Elements/2DMinimap.tscn" id="1_nxvpl"]
+
+[node name="Minimap" type="CanvasLayer"]
+
+[node name="2dMinimap" parent="." instance=ExtResource("1_nxvpl")]

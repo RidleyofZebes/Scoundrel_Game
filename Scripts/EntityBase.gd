@@ -1,13 +1,16 @@
 extends Node3D
 
 
-@export var vision_mode: int = 4 # Default is Torch
+@export var vision_mode: int = 2 # Default is Torch
+@export var is_enemy: bool = false
 
 @onready var tween = $MoveTween
 
 enum VisionMode { BLIND, DARKVISION, TORCH, LANTERN, BULLSEYE}
 
-
+var world: Node = null
+var player: Node3D = null
+var ui: Node = null
 var grid_x: int
 var grid_y: int
 var health: int = 10
@@ -52,12 +55,6 @@ func try_move(dx: int, dy: int) -> bool:
 	
 
 	print("Moving from ", start_position, " to ", end_position)
-	
-	var minimap = get_tree().get_root().get_node("Main/UI/2dMinimap")
-	if minimap:
-		minimap.set_player_pos(Vector2i(grid_x, grid_y), facing)
-	else:
-		print("Minimap not found, dumbass. You gave me: ", minimap)
 
 	return true
 	
@@ -97,7 +94,7 @@ func setup_light():
 			
 		VisionMode.DARKVISION:
 			var light = OmniLight3D.new()
-			light.omni_range = 8
+			light.omni_range = 12
 			light.light_energy = 0.6
 			light.light_color = Color(0.8, 0.8, 0.8)
 			add_child(light)

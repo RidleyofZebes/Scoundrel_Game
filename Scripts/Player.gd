@@ -35,24 +35,49 @@ func _process(delta):
 			if not moving:
 				if try_move(dir.x, dir.y):
 					reveal_tiles(minimap)
+					update_minimap_pos()
+					world.end_player_turn()
 		else:
 			input_repeat_timer -= delta
 			if input_repeat_timer <= 0:
 				if not moving:
 					if try_move(input_direction.x, input_direction.y):
 						reveal_tiles(minimap)
+						update_minimap_pos()
+						world.end_player_turn()
 					input_repeat_timer = input_repeat_rate
 	else:
 		input_held = false
 		input_repeat_timer = 0
 		
 func _unhandled_input(event):
-	if event.is_action_pressed("turn_left"):
+	if   event.is_action_pressed("turn_left"):
 		turn(1)
 		reveal_tiles(minimap)
 	elif event.is_action_pressed("turn_right"):
 		turn(-1)
 		reveal_tiles(minimap)
+	elif event.is_action_pressed("attack"):
+		attack()
+		
+func attack():
+	var dir = direction_vectors[facing]
+	var target_x = grid_x + dir.x
+	var target_y = grid_y + dir.y
+	
+	if target_y < 0 or target_y >= map.size() or target_x < 0 or target_x >= map[0].size():
+		print("Attack out of bounds!")
+		return
+		
+	for ent in world.entity_root.get_children():
+		if ent != self and ent.has_method("take_damage") and ent.grid_x == target_x and ent.grid_y == target_y:
+			print("Player attacks ", ent.name, " at ", target_x, ", ", target_y)
+			MessageBox.say("You attack the %s!" % ent.name)
+			ent.take_damage(3)
+			world.end_player_turn()
+			return
+			
+	print("No target to attack.")
 		
 func get_line(x0: int, y0: int, x1: int, y1: int) -> Array:
 	var line = []
@@ -123,3 +148,6 @@ func reveal_tiles(minimap):
 				minimap.mark_tile_visible(pos)
 				
 	minimap.draw_minimap()
+
+func update_minimap_pos():
+	minimap.set_player_pos(Vector2i(grid_x, grid_y), facing)
