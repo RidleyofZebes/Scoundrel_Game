@@ -4,6 +4,7 @@ extends Node3D
 @export var wall_tile:  PackedScene
 @export var water_tile: PackedScene
 @export var player_entity: PackedScene
+@export var enemy_entity: PackedScene
 @export var minimap_path: NodePath
 @onready var tile_root   = $TileRoot
 @onready var entity_root = $EntityRoot
@@ -45,15 +46,35 @@ func spawn_player():
 	player.map = map
 	player.position = Vector3(player_spawn[0], 0, player_spawn[1])
 	entity_root.add_child(player)
+	var minimap = get_node(minimap_path)
+	player.minimap = minimap
+	player.setup_light()
+	player.call_deferred("reveal_tiles", minimap)
+	
+func spawn_enemies(n):
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	for i in range(n):
+		var e = enemy_entity.instantiate()
+		var pick = spawn_tiles[rng.randi_range(0, spawn_tiles.size()-1)]
+		e.grid_x = pick.x; e.grid_y = pick.y
+		e.map = map
+		e.facing = rng.randi_range(0, 3)
+		e.target_rotation_y = e.facing * 90
+		e.position = Vector3(pick.x, 0, pick.y)
+		entity_root.add_child(e)
+		e.setup_light()
 	
 
 func _ready() -> void:
 	generate_map() # TODO: Take two inputs, map_type and steps
 	spawn_player()
+	spawn_enemies(10)
 	var minimap = get_node(minimap_path)
 	print(minimap)
 	minimap.set_map_data(map)
 	minimap.set_player_pos(Vector2i(player.grid_x, player.grid_y), player.facing)
+	#minimap.set_entity_positions(get_tree().get_node("Main/EntityRoot").get_children().filter(is_enemy))
 
 ## Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta: float) -> void:

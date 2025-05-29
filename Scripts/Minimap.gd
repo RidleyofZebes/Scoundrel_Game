@@ -1,20 +1,23 @@
 extends TextureRect
 
 
-@export var tilemap_layer: Node
+@export var tilemap_layer: Node2D
 @export var entities_layer: Node
 
 #@onready var tilemap_layer = $"Node2D/TileMapLayer"
 #@onready var entities_layer = $"Node2D/Entities"
 
 var map_data = []
+var tile_sprites: Dictionary = {}
+var discovered_tiles := {}
+var visible_tiles := {}
 var player_grid_pos = Vector2i.ZERO
 var player_facing: int = 0
 var entity_positions = []
+var tile_size = 32
 
 func set_map_data(data):
 	map_data = data
-	draw_minimap()
 	
 func set_player_pos(grid_pos, facing):
 	player_grid_pos = grid_pos
@@ -26,38 +29,62 @@ func set_entities(entity_list):
 	entity_positions = entity_list
 	update_entities()
 	
+func color_from_list(rgb_array: Array) -> Color:
+	if rgb_array.size() == 3:
+		return Color(rgb_array[0] / 255.0, rgb_array[1] / 255.0, rgb_array[2] / 255.0, 1.0)
+	else:
+		return Color(1, 0, 1) # The Magenta Error
+	
 func draw_minimap():
-	print("Tilemap layer: ", tilemap_layer)
-	tilemap_layer.clear()
-	var tile_type
-	for y in range(map_data.size()):
-		for x in range (map_data[0].size()):
-			if map_data[y][x] == 0:
-				tile_type = Vector2i(1, 0)
-			elif map_data[y][x] == 1:
-				tile_type = Vector2i(0, 0)
-			# var tile_type = map_data[y][x]
-			tilemap_layer.set_cell(Vector2i(x, y), 0, tile_type, 0)
+	if map_data.is_empty():
+		push_warning("draw_minimap() called but map_data is empty!")
+		return
+	if discovered_tiles.is_empty():
+		push_warning("draw_minimap() called but no discovered tiles!")
+		return
+	for pos in discovered_tiles.keys():
+		var tile_id = map_data[pos.y][pos.x]
+		var tile_info = GlobalTileData.tile_defs.get(str(tile_id), null)
+		if tile_info == null:
+			continue
+
+		var draw_color = color_from_list(tile_info["color"])
+		if not visible_tiles.has(pos):
+			draw_color *= Color(0.4, 0.4, 0.4)
+
+		# Create sprite if it doesn't exist
+		if not tile_sprites.has(pos):
+			var dot = Sprite2D.new()
+			dot.texture = preload("res://Assets/white_pixel.png")
+			dot.scale = Vector2(tile_size, tile_size)
+			dot.position = Vector2(pos.x * tile_size, pos.y * tile_size)
+			tilemap_layer.add_child(dot)
+			tile_sprites[pos] = dot
+
+		# Update sprite color
+		tile_sprites[pos].modulate = draw_color
 			
 func center_minimap_on_player():
-	var tile_size = tilemap_layer.tile_set.tile_size
 	var minimap_size = Vector2(512, 512)
 	
 	var center_pixel = minimap_size / 2
-	var player_pixel_pos = tilemap_layer.map_to_local(player_grid_pos)
+	var player_pixel_pos = Vector2(player_grid_pos.x * tile_size, player_grid_pos.y * tile_size)
 	var offset = center_pixel - player_pixel_pos
 	
 	tilemap_layer.position = offset
 	entities_layer.position = offset
 	
-			
+func mark_tile_visible(grid_pos: Vector2i):
+	discovered_tiles[grid_pos] = true
+	visible_tiles[grid_pos] = true
+	
 func update_entities():
 	for child in entities_layer.get_children():
 		child.queue_free()
 	
 	var player_icon = Sprite2D.new()
 	player_icon.texture = preload("res://Assets/player.png")
-	player_icon.position = tilemap_layer.map_to_local(player_grid_pos)
+	player_icon.position = Vector2(player_grid_pos.x * tile_size, player_grid_pos.y * tile_size)
 	# Rotation bandaid:
 	var minimap_facing = player_facing
 	if minimap_facing == 1:
@@ -70,5 +97,5 @@ func update_entities():
 	for ent in entity_positions:
 		var icon = Sprite2D.new()
 		icon.texture = preload("res://Assets/player.png")
-		icon.position = tilemap_layer.map_to_local(ent)
+		icon.position = Vector2(ent.x * tile_size, ent.y * tile_size)
 		entities_layer.add_child(icon)

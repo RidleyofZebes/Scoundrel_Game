@@ -1,10 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://ceudj14pim2r6"]
+[gd_scene load_steps=11 format=3 uid="uid://ceudj14pim2r6"]
 
 [ext_resource type="Script" uid="uid://dqfohnlj820cf" path="res://Scripts/3DWorld.gd" id="1_1c70s"]
 [ext_resource type="PackedScene" uid="uid://c1hr5l8n0gnxm" path="res://Scenes/Tiles/Floor.tscn" id="2_k83wk"]
 [ext_resource type="PackedScene" uid="uid://d21is7jccs2uj" path="res://Scenes/Tiles/Wall.tscn" id="3_64b26"]
 [ext_resource type="PackedScene" uid="uid://cp3skl0luvayg" path="res://Scenes/Tiles/Water.tscn" id="4_11oji"]
 [ext_resource type="Script" uid="uid://cj78rnraf1u6n" path="res://Scripts/Player.gd" id="5_1c70s"]
+[ext_resource type="PackedScene" uid="uid://cml71xi7wjct1" path="res://Scenes/Entities/Enemy.tscn" id="6_k83wk"]
 [ext_resource type="PackedScene" uid="uid://tvuvgm8bi5l7" path="res://Scenes/UI Elements/EntityBoxes/TileRoot.tscn" id="6_t75jn"]
 [ext_resource type="PackedScene" uid="uid://d38gpe7kq5x0e" path="res://Scenes/UI Elements/EntityBoxes/EntityRoot.tscn" id="7_d71od"]
 
@@ -22,12 +23,19 @@ _bundled = {
 }
 
 [sub_resource type="Environment" id="Environment_k83wk"]
-ambient_light_source = 2
+ambient_light_source = 3
 ambient_light_color = Color(0.0841348, 0.0381798, 0.13299, 1)
-ambient_light_energy = 0.3
+ambient_light_sky_contribution = 0.0
+ambient_light_energy = 0.1
 tonemap_mode = 3
 ssao_enabled = true
 ssao_intensity = 6.0
+fog_enabled = true
+fog_mode = 1
+fog_light_color = Color(0, 0, 0, 1)
+fog_density = 1.0
+fog_depth_begin = 0.0
+fog_depth_end = 15.0
 
 [node name="3dWorld" type="Node3D"]
 script = ExtResource("1_1c70s")
@@ -35,14 +43,10 @@ floor_tile = ExtResource("2_k83wk")
 wall_tile = ExtResource("3_64b26")
 water_tile = ExtResource("4_11oji")
 player_entity = SubResource("PackedScene_k83wk")
+enemy_entity = ExtResource("6_k83wk")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_k83wk")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 0, 0)
-shadow_enabled = true
-shadow_normal_bias = 0.8
 
 [node name="TileRoot" parent="." instance=ExtResource("6_t75jn")]
 

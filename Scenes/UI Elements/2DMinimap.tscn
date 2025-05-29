@@ -1,23 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://cgi45f5uepd87"]
+[gd_scene load_steps=3 format=3 uid="uid://cgi45f5uepd87"]
 
 [ext_resource type="Script" uid="uid://chr51xeb5hkdn" path="res://Scripts/Minimap.gd" id="1_30a8r"]
 [ext_resource type="Texture2D" uid="uid://cgduxs7htho4" path="res://Assets/map_stencil.png" id="1_xufwn"]
-[ext_resource type="Texture2D" uid="uid://dfs6ltv8qhdbu" path="res://Assets/tilemap.png" id="2_xufwn"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_30a8r"]
-texture = ExtResource("2_xufwn")
-texture_region_size = Vector2i(32, 32)
-2:0/0 = 0
-0:1/0 = 0
-1:1/0 = 0
-0:0/0 = 0
-1:0/0 = 0
-
-[sub_resource type="TileSet" id="TileSet_xufwn"]
-tile_size = Vector2i(32, 32)
-sources/0 = SubResource("TileSetAtlasSource_30a8r")
-
-[node name="2dMinimap" type="TextureRect"]
+[node name="2dMinimap" type="TextureRect" node_paths=PackedStringArray("tilemap_layer", "entities_layer")]
 clip_children = 1
 clip_contents = true
 custom_minimum_size = Vector2(256, 256)
@@ -32,10 +18,11 @@ size_flags_vertical = 0
 texture = ExtResource("1_xufwn")
 stretch_mode = 5
 script = ExtResource("1_30a8r")
+tilemap_layer = NodePath("Node2D/TileMapLayer")
+entities_layer = NodePath("Node2D/Entities")
 
 [node name="Node2D" type="Node2D" parent="."]
 
-[node name="TileMapLayer" type="TileMapLayer" parent="Node2D"]
-tile_set = SubResource("TileSet_xufwn")
+[node name="TileMapLayer" type="Node2D" parent="Node2D"]
 
 [node name="Entities" type="Node2D" parent="Node2D"]

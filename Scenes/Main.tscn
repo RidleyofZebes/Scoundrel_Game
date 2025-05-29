@@ -25,10 +25,6 @@ minimap_path = NodePath("../../../UI/2dMinimap")
 
 [node name="UI" parent="." instance=ExtResource("2_idj7w")]
 
-[node name="2dMinimap" parent="UI" index="0" node_paths=PackedStringArray("tilemap_layer", "entities_layer")]
-tilemap_layer = NodePath("Node2D/TileMapLayer")
-entities_layer = NodePath("Node2D/Entities")
-
 [node name="Node2D" parent="UI/2dMinimap" index="0"]
 scale = Vector2(0.5, 0.5)
 
