@@ -16,8 +16,12 @@ func say(message: String) -> void:
 		var fade = clamp(1.0 - float(i) * 0.1, 0.2, 1.0)
 		child.modulate.a = fade
 		
+	call_deferred("_cleanup_log_lines")
+		
 func _cleanup_log_lines() -> void:
-	while log_list.get_child_count() > MAX_LOG_LINES:
-		var child_to_remove := log_list.get_child(0)
-		if is_instance_valid(child_to_remove):
-			child_to_remove.queue_free()
+	var over_limit := log_list.get_child_count() - MAX_LOG_LINES
+	if over_limit > 0:
+		for i in range(over_limit):
+			var oldest = log_list.get_child(log_list.get_child_count() - 1)
+			if is_instance_valid(oldest):
+				oldest.queue_free()
