@@ -3,7 +3,7 @@ extends Node3D
 
 @export var is_enemy: bool = false
 
-@onready var tween = $MoveTween
+#@onready var tween = $MoveTween
 
 enum VisionMode { BLIND, DARKVISION, TORCH, LANTERN, BULLSEYE}
 
@@ -92,8 +92,8 @@ func die():
 		death_screen.show_death("You were slain...")
 	else:
 		remove_from_group("entities")
-		queue_free()
-		if world and world.has_method("refresh_minimap_entities"):
+		call_deferred("queue_free")
+		if is_instance_valid(world) and world.has_method("refresh_minimap_entities"):
 			world.call_deferred("refresh_minimap_entities")
 	
 func setup_light():

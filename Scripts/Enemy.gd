@@ -11,7 +11,7 @@ func _ready():
 		vision_mode = data.get("viewrange", 6)
 		examine_text = data.get("examine", "...")
 		var damage_array = data.get("damage", [1, 4])
-		var damage_range = Vector2i(damage_array[0], damage_array[1])
+		damage_range = Vector2i(damage_array[0], damage_array[1])
 		print("Spawned ", name)
 	else:
 		push_error("Unknown enemy ID: " + enemy_id)
