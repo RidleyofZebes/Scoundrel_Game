@@ -19,7 +19,7 @@ func resume():
 	
 func return_to_title():
 	get_tree().paused = false
-	get_tree().change_scene_to_packed(TITLE_SCREEN)
+	get_tree().change_scene_to_file("res://Scenes/UI Elements/TitleScreen.tscn")
 	
 func _unhandled_input(event):
 	if event.is_action_pressed("pause"):

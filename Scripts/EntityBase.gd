@@ -1,7 +1,6 @@
 extends Node3D
 
 
-@export var vision_mode: int = 2 # Default is Torch
 @export var is_enemy: bool = false
 
 @onready var tween = $MoveTween
@@ -14,6 +13,9 @@ var ui: Node = null
 var grid_x: int
 var grid_y: int
 var health: int = 10
+var damage_range: Vector2i = Vector2i(1, 4)
+var vision_mode: int
+var examine_text: String
 var map: Array = []
 var facing: int  # 0=N, 1=E, 2=S, 3=W
 var current_rotation_y: float = 0.0
@@ -82,10 +84,17 @@ func turn(direction):
 func take_damage(amount):
 	health -= amount
 	if health <= 0:
-		die()
+		call_deferred("die")
 
 func die():
-	queue_free()
+	if not is_enemy:
+		var death_screen = get_tree().get_root().get_node("Main/DeathScreen")
+		death_screen.show_death("You were slain...")
+	else:
+		remove_from_group("entities")
+		queue_free()
+		if world and world.has_method("refresh_minimap_entities"):
+			world.call_deferred("refresh_minimap_entities")
 	
 func setup_light():
 	match vision_mode:

@@ -29,6 +29,10 @@ func set_entities(entity_list):
 	entity_positions = entity_list
 	update_entities()
 	
+#func refresh_minimap_entities():
+	#var enemies = entity_root.get_children().filter(func(e): return e.is_enemy)
+	#minimap.set_entities(enemies)
+	
 func color_from_list(rgb_array: Array) -> Color:
 	if rgb_array.size() == 3:
 		return Color(rgb_array[0] / 255.0, rgb_array[1] / 255.0, rgb_array[2] / 255.0, 1.0)

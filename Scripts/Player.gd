@@ -1,5 +1,6 @@
 extends "res://Scripts/EntityBase.gd"
 
+
 ## Works, but is wrong?
 var direction_vectors = [
 	Vector2i(0, -1),  # N
@@ -59,6 +60,10 @@ func _unhandled_input(event):
 		reveal_tiles(minimap)
 	elif event.is_action_pressed("attack"):
 		attack()
+	elif event.is_action_pressed("examine"):
+		examine()
+	elif event.is_action_pressed("interact"):
+		interact()
 		
 func attack():
 	var dir = direction_vectors[facing]
@@ -78,7 +83,31 @@ func attack():
 			return
 			
 	print("No target to attack.")
-		
+	
+func examine():
+	var dir = direction_vectors[facing]
+	var target_pos = Vector2i(grid_x + dir.x, grid_y + dir.y)
+	
+	for entity in get_tree().get_nodes_in_group("entities"):
+		if entity.grid_x == target_pos.x and entity.grid_y == target_pos.y:
+			if entity.has_variable("examine_text"):
+				MessageBox.say(entity.examine_text)
+				return
+			else:
+				MessageBox.say(entity.name)
+				return
+	if target_pos.y >= 0 and target_pos.y < map.size() and target_pos.x >= 0 and target_pos.x < map[0].size():
+		var tile_id = str(map[target_pos.y][target_pos.x])
+		var tile_data = GlobalTileData.tile_defs.get(tile_id, null)
+		if tile_data and tile_data.has("examine"):
+			MessageBox.say(tile_data["examine"])
+			return
+			
+	MessageBox.say("There's nothing there, except for... No, no, there's nothing.")
+	
+func interact():
+	pass
+	
 func get_line(x0: int, y0: int, x1: int, y1: int) -> Array:
 	var line = []
 	var dx = abs(x1 - x0)

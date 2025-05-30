@@ -5,3 +5,4 @@
 
 [node name="Enemy" instance=ExtResource("1_8q37v")]
 script = ExtResource("2_jajit")
+enemy_id = ""

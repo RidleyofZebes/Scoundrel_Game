@@ -47,6 +47,7 @@ func spawn_player():
 	player.target_rotation_y = player.facing * 90
 	player.rotation_degrees.y = player.target_rotation_y
 	player.map = map
+	player.vision_mode = 2
 	player.ui = ui
 	player.position = Vector3(player_spawn[0], 0, player_spawn[1])
 	var minimap = get_node(minimap_path)
@@ -70,6 +71,8 @@ func spawn_enemies(n):
 		e.position = Vector3(pick.x, 0, pick.y)
 		e.is_enemy = true
 		e.player = player
+		var enemy_id = GlobalEnemyData.get_random_enemy()
+		e.enemy_id = enemy_id
 		entity_root.add_child(e)
 		e.setup_light()
 		
