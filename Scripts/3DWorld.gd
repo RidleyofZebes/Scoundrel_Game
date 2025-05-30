@@ -80,6 +80,7 @@ func end_player_turn():
 	
 
 func _ready() -> void:
+	MessageBox.show()
 	generate_map() # TODO: Take two inputs, map_type and steps
 	spawn_player()
 	spawn_enemies(10)
@@ -87,7 +88,7 @@ func _ready() -> void:
 	print(minimap)
 	minimap.set_map_data(map)
 	minimap.set_player_pos(Vector2i(player.grid_x, player.grid_y), player.facing)
-	MessageBox.say("You venture carefully into the void...")
+	MessageBox.say("You venture forth into the unknown...")
 	#minimap.set_entity_positions(get_tree().get_node("Main/EntityRoot").get_children().filter(is_enemy))
 
 ## Called every frame. 'delta' is the elapsed time since the previous frame.

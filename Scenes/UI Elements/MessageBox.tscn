@@ -1,12 +1,27 @@
-[gd_scene load_steps=3 format=3 uid="uid://ddbpj3eu4m8i8"]
+[gd_scene load_steps=7 format=3 uid="uid://ddbpj3eu4m8i8"]
 
-[ext_resource type="Script" uid="uid://bcvbg6m7xjhy" path="res://Scripts/UI.gd" id="1_1huvh"]
+[ext_resource type="Script" uid="uid://bcvbg6m7xjhy" path="res://Scripts/MessageBox.gd" id="1_1huvh"]
 [ext_resource type="FontFile" uid="uid://dxi5ehx81n7ss" path="res://Assets/Alkhemikal.ttf" id="2_7i60w"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_66h4w"]
+blend_mode = 3
+
+[sub_resource type="Gradient" id="Gradient_66h4w"]
+colors = PackedColorArray(0, 0, 0, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_7qex8"]
+gradient = SubResource("Gradient_66h4w")
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
+
+[sub_resource type="Theme" id="Theme_7qex8"]
+default_font = ExtResource("2_7i60w")
+default_font_size = 28
 
 [node name="UI" type="CanvasLayer"]
 script = ExtResource("1_1huvh")
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="LogBox" type="PanelContainer" parent="."]
 custom_minimum_size = Vector2(0, 150)
 anchors_preset = 12
 anchor_top = 1.0
@@ -19,14 +34,26 @@ offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+[node name="ColorRect" type="TextureRect" parent="LogBox"]
+material = SubResource("CanvasItemMaterial_66h4w")
+layout_mode = 2
+texture = SubResource("GradientTexture2D_7qex8")
+
+[node name="TextMargin" type="MarginContainer" parent="LogBox"]
 layout_mode = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="RichTextLabel" type="RichTextLabel" parent="PanelContainer/MarginContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="LogBox/TextMargin"]
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
-theme_override_fonts/normal_font = ExtResource("2_7i60w")
-theme_override_font_sizes/normal_font_size = 32
+horizontal_scroll_mode = 0
+
+[node name="LogList" type="VBoxContainer" parent="LogBox/TextMargin/ScrollContainer"]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = SubResource("Theme_7qex8")
+theme_override_constants/separation = 2

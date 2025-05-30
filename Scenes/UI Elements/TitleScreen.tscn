@@ -1,0 +1,44 @@
+[gd_scene load_steps=4 format=3 uid="uid://81jhytdsgolg"]
+
+[ext_resource type="Script" uid="uid://dxcwxr6lq2qou" path="res://Scripts/title_screen.gd" id="1_u66os"]
+[ext_resource type="FontFile" uid="uid://dxi5ehx81n7ss" path="res://Assets/Alkhemikal.ttf" id="2_easbr"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_x06ds"]
+font = ExtResource("2_easbr")
+font_size = 100
+
+[node name="TitleScreen" type="CanvasLayer"]
+script = ExtResource("1_u66os")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+
+[node name="SCOUNDREL" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "SCOUNDREL"
+label_settings = SubResource("LabelSettings_x06ds")
+
+[node name="Control" type="Control" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+
+[node name="Start" type="Button" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_easbr")
+theme_override_font_sizes/font_size = 28
+text = "Start"
+
+[node name="Quit" type="Button" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_easbr")
+theme_override_font_sizes/font_size = 28
+text = "Quit"
