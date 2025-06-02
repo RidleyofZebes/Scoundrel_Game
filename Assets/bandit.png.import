@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cgduxs7htho4"
-path.s3tc="res://.godot/imported/map_stencil.png-45988a25236826a3462c8e6791f87de8.s3tc.ctex"
+uid="uid://nq1s7nycovgh"
+path.s3tc="res://.godot/imported/bandit.png-bda8dfb934a03f73f091ddf1dcf4cf28.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Assets/map_stencil.png"
-dest_files=["res://.godot/imported/map_stencil.png-45988a25236826a3462c8e6791f87de8.s3tc.ctex"]
+source_file="res://Assets/bandit.png"
+dest_files=["res://.godot/imported/bandit.png-bda8dfb934a03f73f091ddf1dcf4cf28.s3tc.ctex"]
 
 [params]
 

@@ -4,7 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://cgduxs7htho4" path="res://Assets/map_stencil.png" id="1_xufwn"]
 
 [node name="2dMinimap" type="TextureRect" node_paths=PackedStringArray("tilemap_layer", "entities_layer")]
-clip_children = 1
+self_modulate = Color(0.129412, 0.129412, 0.129412, 0.890196)
+clip_children = 2
 clip_contents = true
 custom_minimum_size = Vector2(256, 256)
 anchors_preset = 1

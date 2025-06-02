@@ -12,6 +12,7 @@ extends Node3D
 var map = MapGenerator.drunken_walk(2400)
 # var map = MapGenerator.void_platform(32) # debug room
 var spawn_tiles = []
+var occupied_tiles: Dictionary = {}
 var player : Node3D
 var ui : Node = null
 
@@ -41,6 +42,7 @@ func spawn_player():
 	random.randomize()
 	
 	var player_spawn = spawn_tiles[random.randi_range(0, spawn_tiles.size() -1)]
+	occupied_tiles[player_spawn] = player
 	player.grid_x = player_spawn[0]
 	player.grid_y = player_spawn[1]
 	player.facing = random.randi_range(0, 3)
@@ -54,7 +56,6 @@ func spawn_player():
 	player.minimap = minimap
 	player.world = self
 	entity_root.add_child(player)
-	
 	player.setup_light()
 	player.call_deferred("reveal_tiles", minimap)
 	
@@ -64,6 +65,8 @@ func spawn_enemies(n):
 	for i in range(n):
 		var e = enemy_entity.instantiate()
 		var pick = spawn_tiles[rng.randi_range(0, spawn_tiles.size()-1)]
+		if occupied_tiles.has(pick):
+			continue
 		e.grid_x = pick.x; e.grid_y = pick.y
 		e.map = map
 		e.facing = rng.randi_range(0, 3)
@@ -71,9 +74,11 @@ func spawn_enemies(n):
 		e.position = Vector3(pick.x, 0, pick.y)
 		e.is_enemy = true
 		e.player = player
+		e.world = self
 		var enemy_id = GlobalEnemyData.get_random_enemy()
 		e.enemy_id = enemy_id
 		entity_root.add_child(e)
+		occupied_tiles[pick] = e
 		e.setup_light()
 		
 func end_player_turn():

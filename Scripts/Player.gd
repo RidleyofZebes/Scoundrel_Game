@@ -14,6 +14,19 @@ var input_direction := Vector2i.ZERO
 var input_repeat_timer := 0.0
 var input_repeat_delay := 0.4
 var input_repeat_rate := 0.1
+var display_name: String = "You"
+
+var stats := {
+	"Luck": 5,
+	"Charm": 5,
+	"Wit": 5,
+	"Brawn": 5,
+	"Edge": 5,
+	"Grit": 5
+}
+
+func get_stat(stat_name: String) -> int:
+	return stats.get(stat_name, 0)
 
 func _process(delta):		
 	var dir = Vector2i.ZERO
@@ -66,6 +79,16 @@ func _unhandled_input(event):
 		interact()
 		
 func attack():
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	var base = rng.randi_range(1, 6) #1d6 damage hardcoded for now, no weapons to calculate from yet.
+	var bonus = get_stat("Brawn") / 2
+	var damage = base + bonus
+	var is_crit = rng.randi_range(1, 100) <= get_stat("Luck") * 2
+	if is_crit:
+		damage *= 2
+		MessageBox.say("Critical hit!")
+	
 	var dir = direction_vectors[facing]
 	var target_x = grid_x + dir.x
 	var target_y = grid_y + dir.y
@@ -77,8 +100,8 @@ func attack():
 	for ent in world.entity_root.get_children():
 		if ent != self and ent.has_method("take_damage") and ent.grid_x == target_x and ent.grid_y == target_y:
 			print("Player attacks ", ent.name, " at ", target_x, ", ", target_y)
-			MessageBox.say("You attack the %s!" % ent.name)
-			ent.take_damage(3)
+			MessageBox.say("You attack the %s for %d damage!" % [ent.display_name, damage])
+			ent.take_damage(damage)
 			world.end_player_turn()
 			return
 			
@@ -90,11 +113,12 @@ func examine():
 	
 	for entity in get_tree().get_nodes_in_group("entities"):
 		if entity.grid_x == target_pos.x and entity.grid_y == target_pos.y:
-			if entity.has_variable("examine_text"):
+			print("Found match:", entity.name, entity.examine_text) 
+			MessageBox.say(entity.examine_text)
+			if entity.examine_text != "":
 				MessageBox.say(entity.examine_text)
-				return
 			else:
-				MessageBox.say(entity.name)
+				MessageBox.say(entity.display_name)
 				return
 	if target_pos.y >= 0 and target_pos.y < map.size() and target_pos.x >= 0 and target_pos.x < map[0].size():
 		var tile_id = str(map[target_pos.y][target_pos.x])

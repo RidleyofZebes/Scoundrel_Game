@@ -2,17 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cgduxs7htho4"
-path.s3tc="res://.godot/imported/map_stencil.png-45988a25236826a3462c8e6791f87de8.s3tc.ctex"
+uid="uid://uxs0ympll385"
+path.s3tc="res://.godot/imported/Floor TIle_0.png-4dd1c13d9850d38574ec0bb0fc987c8c.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
+generator_parameters={
+"md5": "6a7ca7d79237612bc0928d96dfb1cf97"
+}
 
 [deps]
 
-source_file="res://Assets/map_stencil.png"
-dest_files=["res://.godot/imported/map_stencil.png-45988a25236826a3462c8e6791f87de8.s3tc.ctex"]
+source_file="res://Assets/Floor TIle_0.png"
+dest_files=["res://.godot/imported/Floor TIle_0.png-4dd1c13d9850d38574ec0bb0fc987c8c.s3tc.ctex"]
 
 [params]
 

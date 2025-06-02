@@ -1,23 +1,15 @@
-[gd_scene load_steps=5 format=3 uid="uid://c1hr5l8n0gnxm"]
+[gd_scene load_steps=3 format=3 uid="uid://c1hr5l8n0gnxm"]
 
-[ext_resource type="Texture2D" uid="uid://cya5oaerfubdr" path="res://Assets/floor.png" id="1_fco83"]
+[ext_resource type="PackedScene" uid="uid://c5fya178832sy" path="res://Assets/Floor TIle.gltf" id="1_fco83"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_qasmd"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_fco83"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3orql"]
-albedo_texture = ExtResource("1_fco83")
-uv1_scale = Vector3(4, 4, 4)
-
 [node name="Floor" type="Node3D"]
-transform = Transform3D(1, 0, 0, 0, 0.1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
 shape = SubResource("BoxShape3D_qasmd")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("BoxMesh_fco83")
-surface_material_override/0 = SubResource("StandardMaterial3D_3orql")
+[node name="blockbench_export" parent="." instance=ExtResource("1_fco83")]

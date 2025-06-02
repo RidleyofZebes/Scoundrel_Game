@@ -30,6 +30,8 @@ var moving: bool = false
 
 func _ready():
 	current_rotation_y = rotation_degrees.y
+	print("Entity ready: ", self.name)
+	add_to_group("entities")
 
 func try_move(dx: int, dy: int) -> bool:
 	if moving:
@@ -37,12 +39,20 @@ func try_move(dx: int, dy: int) -> bool:
 	
 	var new_x = grid_x + dx
 	var new_y = grid_y + dy
+	var target_pos = Vector2i(new_x, new_y)
 	if new_y < 0 or new_y >= map.size() or new_x < 0 or new_x >= map[0].size():
 		print("can't move to ", new_x, " ", new_y, ", out of bounds!")
 		return false
 	if map[new_y][new_x] != 1:
 		print("can't move!")
 		return false
+	if world.occupied_tiles.has(target_pos):
+		print("There's already an entity there.")
+		return false
+		
+	var old_pos = Vector2i(grid_x, grid_y)
+	world.occupied_tiles.erase(old_pos)
+	world.occupied_tiles[target_pos] = self
 		
 	grid_x = new_x
 	grid_y = new_y
@@ -91,10 +101,13 @@ func die():
 		var death_screen = get_tree().get_root().get_node("Main/DeathScreen")
 		death_screen.show_death("You were slain...")
 	else:
+		var current_pos = Vector2i(grid_x, grid_y)
+		world.occupied_tiles.erase(current_pos)
 		remove_from_group("entities")
 		call_deferred("queue_free")
 		if is_instance_valid(world) and world.has_method("refresh_minimap_entities"):
 			world.call_deferred("refresh_minimap_entities")
+
 	
 func setup_light():
 	match vision_mode:

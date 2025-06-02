@@ -1,14 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://d21is7jccs2uj"]
+[gd_scene load_steps=3 format=3 uid="uid://d21is7jccs2uj"]
 
-[ext_resource type="Texture2D" uid="uid://bldixconjr6um" path="res://Assets/wall.png" id="1_cu1n4"]
+[ext_resource type="PackedScene" uid="uid://b0w7ejeqjgcuf" path="res://Assets/Wall Tile.gltf" id="1_cu1n4"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ybexf"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_cu1n4"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cu1n4"]
-albedo_texture = ExtResource("1_cu1n4")
-uv1_scale = Vector3(3, 3, 3)
 
 [node name="Wall" type="Node3D"]
 
@@ -17,6 +11,5 @@ uv1_scale = Vector3(3, 3, 3)
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
 shape = SubResource("BoxShape3D_ybexf")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("BoxMesh_cu1n4")
-surface_material_override/0 = SubResource("StandardMaterial3D_cu1n4")
+[node name="blockbench_export" parent="." instance=ExtResource("1_cu1n4")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, -0.5, 0)

@@ -1,10 +1,18 @@
-[gd_scene load_steps=4 format=3 uid="uid://cwtjahrkn6c2p"]
+[gd_scene load_steps=7 format=3 uid="uid://b6b5dpp11o1rp"]
 
 [ext_resource type="Script" uid="uid://bhmfjl15mnslg" path="res://Scripts/EntityBase.gd" id="1_gt1tw"]
+[ext_resource type="Texture2D" uid="uid://cgduxs7htho4" path="res://Assets/map_stencil.png" id="2_2qhed"]
+[ext_resource type="Texture2D" uid="uid://bcyuu6tghsgq6" path="res://Assets/spectre.png" id="2_rkwyp"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_8ywif"]
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_jyyo6"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rkwyp"]
+transparency = 1
+albedo_color = Color(0, 0, 0, 0.866667)
+albedo_texture = ExtResource("2_2qhed")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_2qhed"]
+material = SubResource("StandardMaterial3D_rkwyp")
 
 [node name="EntityBase" type="Node3D"]
 script = ExtResource("1_gt1tw")
@@ -14,5 +22,13 @@ script = ExtResource("1_gt1tw")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
 shape = SubResource("CapsuleShape3D_8ywif")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("CapsuleMesh_jyyo6")
+[node name="EntitySprite" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+billboard = 2
+shaded = true
+texture_filter = 0
+texture = ExtResource("2_rkwyp")
+
+[node name="Shadow" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, -0.4, 0)
+mesh = SubResource("PlaneMesh_2qhed")
