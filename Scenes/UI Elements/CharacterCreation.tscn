@@ -1,0 +1,174 @@
+[gd_scene load_steps=5 format=3 uid="uid://cd4cu4mwe5gtw"]
+
+[ext_resource type="Texture2D" uid="uid://b4bs36a7bgafl" path="res://Assets/male.png" id="1_wy1n4"]
+[ext_resource type="Texture2D" uid="uid://c7gjomwjyn027" path="res://Assets/female.png" id="2_e327y"]
+[ext_resource type="Texture2D" uid="uid://d0iokwtl5nj5l" path="res://Assets/button_down.png" id="3_bqqo2"]
+[ext_resource type="Texture2D" uid="uid://lrdooo2qphou" path="res://Assets/button_up.png" id="4_55cfx"]
+
+[node name="CharacterCreation" type="CanvasLayer"]
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PlayerName" type="LineEdit" parent="HBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="GenderSelect" type="OptionButton" parent="HBoxContainer"]
+layout_mode = 2
+selected = 0
+allow_reselect = true
+item_count = 2
+popup/item_0/text = "Male"
+popup/item_0/icon = ExtResource("1_wy1n4")
+popup/item_0/id = 0
+popup/item_1/text = "Female"
+popup/item_1/icon = ExtResource("2_e327y")
+popup/item_1/id = 1
+
+[node name="StatAdjust" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Luck" type="Label" parent="HBoxContainer/StatAdjust"]
+layout_mode = 2
+text = "Luck"
+horizontal_alignment = 1
+
+[node name="LuckButtons" type="HBoxContainer" parent="HBoxContainer/StatAdjust"]
+layout_mode = 2
+
+[node name="Luck_Down" type="Button" parent="HBoxContainer/StatAdjust/LuckButtons"]
+layout_mode = 2
+icon = ExtResource("3_bqqo2")
+flat = true
+
+[node name="Luck_Points" type="Label" parent="HBoxContainer/StatAdjust/LuckButtons"]
+layout_mode = 2
+text = "5"
+
+[node name="Luck_Up" type="Button" parent="HBoxContainer/StatAdjust/LuckButtons"]
+layout_mode = 2
+icon = ExtResource("4_55cfx")
+flat = true
+
+[node name="Charm" type="Label" parent="HBoxContainer/StatAdjust"]
+layout_mode = 2
+text = "Charm"
+horizontal_alignment = 1
+
+[node name="CharmButtons" type="HBoxContainer" parent="HBoxContainer/StatAdjust"]
+layout_mode = 2
+
+[node name="Charm_Down" type="Button" parent="HBoxContainer/StatAdjust/CharmButtons"]
+layout_mode = 2
+icon = ExtResource("3_bqqo2")
+flat = true
+
+[node name="Charm_Points" type="Label" parent="HBoxContainer/StatAdjust/CharmButtons"]
+layout_mode = 2
+text = "5"
+
+[node name="Charm_Up" type="Button" parent="HBoxContainer/StatAdjust/CharmButtons"]
+layout_mode = 2
+icon = ExtResource("4_55cfx")
+flat = true
+
+[node name="Wit" type="Label" parent="HBoxContainer/StatAdjust"]
+layout_mode = 2
+text = "Wit"
+horizontal_alignment = 1
+
+[node name="WitButtons" type="HBoxContainer" parent="HBoxContainer/StatAdjust"]
+layout_mode = 2
+
+[node name="Wit_Down" type="Button" parent="HBoxContainer/StatAdjust/WitButtons"]
+layout_mode = 2
+icon = ExtResource("3_bqqo2")
+flat = true
+
+[node name="Wit_Points" type="Label" parent="HBoxContainer/StatAdjust/WitButtons"]
+layout_mode = 2
+text = "5"
+
+[node name="Wit_Up" type="Button" parent="HBoxContainer/StatAdjust/WitButtons"]
+layout_mode = 2
+icon = ExtResource("4_55cfx")
+flat = true
+
+[node name="Brawn" type="Label" parent="HBoxContainer/StatAdjust"]
+layout_mode = 2
+text = "Brawn"
+horizontal_alignment = 1
+
+[node name="BrawnButtons" type="HBoxContainer" parent="HBoxContainer/StatAdjust"]
+layout_mode = 2
+
+[node name="Brawn_Down" type="Button" parent="HBoxContainer/StatAdjust/BrawnButtons"]
+layout_mode = 2
+icon = ExtResource("3_bqqo2")
+flat = true
+
+[node name="Brawn_Points" type="Label" parent="HBoxContainer/StatAdjust/BrawnButtons"]
+layout_mode = 2
+text = "5"
+
+[node name="Brawn_Up" type="Button" parent="HBoxContainer/StatAdjust/BrawnButtons"]
+layout_mode = 2
+icon = ExtResource("4_55cfx")
+flat = true
+
+[node name="Edge" type="Label" parent="HBoxContainer/StatAdjust"]
+layout_mode = 2
+text = "Edge"
+horizontal_alignment = 1
+
+[node name="EdgeButtons" type="HBoxContainer" parent="HBoxContainer/StatAdjust"]
+layout_mode = 2
+
+[node name="Edge_Down" type="Button" parent="HBoxContainer/StatAdjust/EdgeButtons"]
+layout_mode = 2
+icon = ExtResource("3_bqqo2")
+flat = true
+
+[node name="Edge_Points" type="Label" parent="HBoxContainer/StatAdjust/EdgeButtons"]
+layout_mode = 2
+text = "5"
+
+[node name="Edge_Up" type="Button" parent="HBoxContainer/StatAdjust/EdgeButtons"]
+layout_mode = 2
+icon = ExtResource("4_55cfx")
+flat = true
+
+[node name="Grit" type="Label" parent="HBoxContainer/StatAdjust"]
+layout_mode = 2
+text = "Grit"
+horizontal_alignment = 1
+
+[node name="GritButtons" type="HBoxContainer" parent="HBoxContainer/StatAdjust"]
+layout_mode = 2
+
+[node name="Grit_Down" type="Button" parent="HBoxContainer/StatAdjust/GritButtons"]
+layout_mode = 2
+icon = ExtResource("3_bqqo2")
+flat = true
+
+[node name="Grit_Points" type="Label" parent="HBoxContainer/StatAdjust/GritButtons"]
+layout_mode = 2
+text = "5"
+
+[node name="Grit_Up" type="Button" parent="HBoxContainer/StatAdjust/GritButtons"]
+layout_mode = 2
+icon = ExtResource("4_55cfx")
+flat = true
+
+[node name="PointPool" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="Confirm" type="Button" parent="HBoxContainer"]
+visible = false
+layout_mode = 2

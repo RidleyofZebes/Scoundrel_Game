@@ -102,6 +102,8 @@ func attack():
 			print("Player attacks ", ent.name, " at ", target_x, ", ", target_y)
 			MessageBox.say("You attack the %s for %d damage!" % [ent.display_name, damage])
 			ent.take_damage(damage)
+			if ent.health <=0:
+				MessageBox.say("The %s is slain!" % ent.display_name)
 			world.end_player_turn()
 			return
 			
@@ -113,10 +115,10 @@ func examine():
 	
 	for entity in get_tree().get_nodes_in_group("entities"):
 		if entity.grid_x == target_pos.x and entity.grid_y == target_pos.y:
-			print("Found match:", entity.name, entity.examine_text) 
-			MessageBox.say(entity.examine_text)
+			print("Found match:", entity.name) 
 			if entity.examine_text != "":
 				MessageBox.say(entity.examine_text)
+				return
 			else:
 				MessageBox.say(entity.display_name)
 				return

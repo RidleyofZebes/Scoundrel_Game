@@ -32,7 +32,7 @@
   "zombie": {
 	"name":      "Zombie",
 	"mobtype":   "humanoid",
-	"examine":   "The rotting, stinking remains of a man, it's face no longer recognizable in death. Perhaps it was once a beloved member of a family, but now animated by foul magics, it is nothing but a roaming corpse.",
+	"examine":   "The rotting, stinking remains of a man, its face no longer recognizable in death. Perhaps it was once a beloved member of a family, but now animated by foul magics, it is nothing but a roaming corpse.",
 	"sprite":    "res://Assets/spectre.png",
 	"hp":        15,
 	"weapon":    "Ragged Claws",
