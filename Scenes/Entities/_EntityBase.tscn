@@ -23,7 +23,6 @@ script = ExtResource("1_gt1tw")
 shape = SubResource("CapsuleShape3D_8ywif")
 
 [node name="EntitySprite" type="Sprite3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
 billboard = 2
 shaded = true
 texture_filter = 0

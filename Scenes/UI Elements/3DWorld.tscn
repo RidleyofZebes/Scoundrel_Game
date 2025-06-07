@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://ceudj14pim2r6"]
+[gd_scene load_steps=11 format=3 uid="uid://ceudj14pim2r6"]
 
 [ext_resource type="Script" uid="uid://dqfohnlj820cf" path="res://Scripts/3DWorld.gd" id="1_1c70s"]
 [ext_resource type="PackedScene" uid="uid://c1hr5l8n0gnxm" path="res://Scenes/Tiles/Floor.tscn" id="2_k83wk"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://b0dmxepnleixh" path="res://Scenes/Entities/Enemy.tscn" id="6_k83wk"]
 [ext_resource type="PackedScene" uid="uid://tvuvgm8bi5l7" path="res://Scenes/UI Elements/EntityBoxes/TileRoot.tscn" id="6_t75jn"]
 [ext_resource type="PackedScene" uid="uid://d38gpe7kq5x0e" path="res://Scenes/UI Elements/EntityBoxes/EntityRoot.tscn" id="7_d71od"]
+[ext_resource type="Script" uid="uid://8xxq7r08opy6" path="res://Scripts/HoverDetector.gd" id="9_64b26"]
 
 [sub_resource type="Environment" id="Environment_k83wk"]
 ambient_light_source = 3
@@ -38,3 +39,6 @@ environment = SubResource("Environment_k83wk")
 [node name="TileRoot" parent="." instance=ExtResource("6_t75jn")]
 
 [node name="EntityRoot" parent="." instance=ExtResource("7_d71od")]
+
+[node name="HoverDetector" type="Node3D" parent="."]
+script = ExtResource("9_64b26")

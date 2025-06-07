@@ -6,3 +6,9 @@
 [node name="Enemy" instance=ExtResource("1_8q37v")]
 script = ExtResource("2_jajit")
 enemy_id = ""
+
+[node name="EntitySprite" parent="." index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+
+[node name="Shadow" parent="." index="2"]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, -0.49, 0)

@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bujnf63n1kkd7"
-path.s3tc="res://.godot/imported/Floor TIle_1.png-2d06463b55d046158a4cd670884c2954.s3tc.ctex"
+uid="uid://df6mxvofwarh8"
+path.s3tc="res://.godot/imported/FloorTile_0.png-dd6703a77d62923f646c72224082f6e0.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "cf57d4dddb49b84eabff7fdcb93d6f3b"
+"md5": "6a7ca7d79237612bc0928d96dfb1cf97"
 }
 
 [deps]
 
-source_file="res://Assets/Floor TIle_1.png"
-dest_files=["res://.godot/imported/Floor TIle_1.png-2d06463b55d046158a4cd670884c2954.s3tc.ctex"]
+source_file="res://Assets/FloorTile_0.png"
+dest_files=["res://.godot/imported/FloorTile_0.png-dd6703a77d62923f646c72224082f6e0.s3tc.ctex"]
 
 [params]
 

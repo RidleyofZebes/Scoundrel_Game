@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://c5fya178832sy"
-path="res://.godot/imported/Floor TIle.gltf-4f0c19c07ddd9ddea5705cdb2bf9814c.scn"
+uid="uid://du1w8yp40is77"
+path="res://.godot/imported/FloorTile.glb-af52b30e62ee9c58387cd3548506515e.scn"
 
 [deps]
 
-source_file="res://Assets/Floor TIle.gltf"
-dest_files=["res://.godot/imported/Floor TIle.gltf-4f0c19c07ddd9ddea5705cdb2bf9814c.scn"]
+source_file="res://Assets/FloorTile.glb"
+dest_files=["res://.godot/imported/FloorTile.glb-af52b30e62ee9c58387cd3548506515e.scn"]
 
 [params]
 

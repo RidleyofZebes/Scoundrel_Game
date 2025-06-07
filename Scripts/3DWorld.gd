@@ -9,8 +9,8 @@ extends Node3D
 @onready var tile_root   = $TileRoot
 @onready var entity_root = $EntityRoot
 
-var map = MapGenerator.drunken_walk(2400)
-# var map = MapGenerator.void_platform(32) # debug room
+# var map = MapGenerator.drunken_walk(2400)
+var map = MapGenerator.void_platform(32) # debug room
 var spawn_tiles = []
 var occupied_tiles: Dictionary = {}
 var player : Node3D
@@ -31,8 +31,10 @@ func generate_map():
 				spawn_tiles.append(Vector2i(x, y))
 			elif map[y][x] == 2: # Water tile for later
 				pass
-			var tile = scene.instantiate()
+			var tile: TileBase = scene.instantiate()
 			tile.position = tile_pos
+			if tile is TileBase:
+				tile.tile_id = map[y][x]
 			tile_root.add_child(tile)
 
 func spawn_player():
@@ -56,6 +58,8 @@ func spawn_player():
 	player.minimap = minimap
 	player.world = self
 	entity_root.add_child(player)
+	var camera = player.get_node("Camera3D")
+	$HoverDetector.set_camera(camera)
 	player.setup_light()
 	player.call_deferred("reveal_tiles", minimap)
 	
@@ -85,7 +89,6 @@ func end_player_turn():
 	for child in entity_root.get_children():
 		if child.has_method("take_turn"):
 			child.active = true
-	
 
 func _ready() -> void:
 	MessageBox.show()
