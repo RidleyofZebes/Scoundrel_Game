@@ -9,8 +9,8 @@ extends Node3D
 @onready var tile_root   = $TileRoot
 @onready var entity_root = $EntityRoot
 
-# var map = MapGenerator.drunken_walk(2400)
-var map = MapGenerator.void_platform(32) # debug room
+var map = MapGenerator.drunken_walk(2400)
+# var map = MapGenerator.void_platform(32) # debug room
 var spawn_tiles = []
 var occupied_tiles: Dictionary = {}
 var player : Node3D

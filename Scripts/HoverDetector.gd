@@ -46,4 +46,4 @@ func highlight_node(node):
 		if node.has_method("set_highlight"):
 			node.set_highlight(true)
 			current_hovered = node
-			print("hovering on: ", node.name, node.tile_id)
+			# print("hovering on: ", node.name, node.tile_id)

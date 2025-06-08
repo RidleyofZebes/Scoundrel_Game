@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://pkhq3irbscbk"]
+
+[ext_resource type="Shader" uid="uid://dcqokx00yigj1" path="res://Assets/Shaders/GlowOverlay.gdshader" id="1_1p27a"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_1p27a")
+shader_parameter/highlight_enabled = false
+shader_parameter/highlight_color = Color(0, 1, 1, 0.1)

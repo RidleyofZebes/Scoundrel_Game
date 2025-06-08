@@ -4,16 +4,20 @@ extends Node3D
 @export var examine_text := ""
 @export var tile_id: int = -1
 @onready var mesh: MeshInstance3D = null
+@onready var glow_overlay := $GlowOverlay
 var default_material = Material
 
 func _ready() -> void:
 	add_to_group("selectable")
 	mesh = find_mesh_instance(self)
 	if mesh:
-		default_material = mesh.material_override
+		if mesh.material_override:
+			mesh.material_override = mesh.material_override.duplicate()
+			mesh.material_override.set_shader_parameter("highlight_enabled", false)
+			default_material = mesh.material_override
+		else: push_warning("Mesh has no material_override in tile: " + name)
 	else:
-		push_warning("❗ MeshInstance3D not found in tile: " + name)
-	default_material = mesh.material_override
+		push_warning("MeshInstance3D not found in tile: " + name)
 	
 func find_mesh_instance(node: Node) -> MeshInstance3D:
 	for child in node.get_children():
@@ -26,12 +30,8 @@ func find_mesh_instance(node: Node) -> MeshInstance3D:
 	return null
 
 func set_highlight(enabled: bool) -> void:
-	pass
-	if enabled: 
-		var highlight_mat = preload("res://Assets/HighlightMaterial.tres")
-		mesh.material_override = highlight_mat
-	else:
-		mesh.material_override = default_material
+	if glow_overlay:
+		glow_overlay.visible = enabled
 		
 func get_examine_text() -> String:
 	if tile_id >= 0:

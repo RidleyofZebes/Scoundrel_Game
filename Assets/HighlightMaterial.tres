@@ -1,6 +1,0 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://ddql7jjkymkoe"]
-
-[resource]
-emission_enabled = true
-emission = Color(0.305882, 0.615686, 0.87451, 1)
-emission_energy_multiplier = 2.0

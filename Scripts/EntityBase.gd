@@ -2,6 +2,7 @@ extends Node3D
 
 
 @export var is_enemy: bool = false
+@onready var glow_sprite := $GlowSprite
 
 #@onready var tween = $MoveTween
 
@@ -107,7 +108,13 @@ func die():
 		call_deferred("queue_free")
 		if is_instance_valid(world) and world.has_method("refresh_minimap_entities"):
 			world.call_deferred("refresh_minimap_entities")
-
+			
+func set_highlight(enabled: bool) -> void:
+	if glow_sprite:
+		glow_sprite.visible = enabled
+		
+func get_examine_text() -> String:
+	return examine_text if examine_text != "" else "It stares back at you..."
 	
 func setup_light():
 	match vision_mode:
