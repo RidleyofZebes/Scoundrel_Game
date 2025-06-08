@@ -1,17 +1,30 @@
 extends Node3D
 
 @onready var camera: Camera3D = null
+var camera_initial_position: Vector3
+const LOOK_SHIFT_RADIUS := 0.15
 var current_hovered : Node3D = null
 
 func set_camera(cam: Camera3D) -> void:
 	camera = cam
+	camera_initial_position = cam.transform.origin
 
 func _physics_process(delta: float) -> void:
 	if GameState.current_mode != GameState.CursorMode.LOOK:
+		if camera:
+			camera.transform.origin = camera_initial_position
 		clear_hover()
 		return
 		
 	var mouse_pos = get_viewport().get_mouse_position()
+	var viewport_size = get_viewport().size
+	var center = viewport_size / 2.0
+	var offset = (mouse_pos - center) / center
+	offset.x *= LOOK_SHIFT_RADIUS
+	offset.y *= -LOOK_SHIFT_RADIUS
+	var target_pos = camera_initial_position + Vector3(offset.x, offset.y, 0) 
+	camera.transform.origin = camera.transform.origin.lerp(target_pos, delta * 5.0)
+	
 	var from = camera.project_ray_origin(mouse_pos)
 	var to = from + camera.project_ray_normal(mouse_pos) * 1000
 	
