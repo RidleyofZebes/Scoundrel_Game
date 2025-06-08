@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bcyuu6tghsgq6"
-path.s3tc="res://.godot/imported/spectre.png-1b37510a4d7b4eb0b526e1f0ff942a57.s3tc.ctex"
+uid="uid://cjw6tahtxysdj"
+path.s3tc="res://.godot/imported/TargetIndicator.png-2c0abadf03aab39621fa33948baaa013.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Assets/spectre.png"
-dest_files=["res://.godot/imported/spectre.png-1b37510a4d7b4eb0b526e1f0ff942a57.s3tc.ctex"]
+source_file="res://Assets/Cursors/TargetIndicator.png"
+dest_files=["res://.godot/imported/TargetIndicator.png-2c0abadf03aab39621fa33948baaa013.s3tc.ctex"]
 
 [params]
 

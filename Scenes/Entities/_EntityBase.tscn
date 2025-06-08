@@ -1,9 +1,9 @@
 [gd_scene load_steps=8 format=3 uid="uid://b6b5dpp11o1rp"]
 
 [ext_resource type="Script" uid="uid://bhmfjl15mnslg" path="res://Scripts/EntityBase.gd" id="1_gt1tw"]
-[ext_resource type="Texture2D" uid="uid://cgduxs7htho4" path="res://Assets/map_stencil.png" id="2_2qhed"]
-[ext_resource type="Texture2D" uid="uid://bcyuu6tghsgq6" path="res://Assets/spectre.png" id="2_rkwyp"]
-[ext_resource type="Texture2D" uid="uid://cjw6tahtxysdj" path="res://Assets/TargetIndicator.png" id="4_wxhxp"]
+[ext_resource type="Texture2D" uid="uid://cgduxs7htho4" path="res://Assets/Interface/map_stencil.png" id="2_2qhed"]
+[ext_resource type="Texture2D" uid="uid://bcyuu6tghsgq6" path="res://Assets/Sprites/spectre.png" id="2_rkwyp"]
+[ext_resource type="Texture2D" uid="uid://cjw6tahtxysdj" path="res://Assets/Cursors/TargetIndicator.png" id="4_wxhxp"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_8ywif"]
 

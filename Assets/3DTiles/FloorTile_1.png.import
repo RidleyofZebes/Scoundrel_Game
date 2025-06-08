@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cugmou2wm0x23"
-path.s3tc="res://.godot/imported/Wall Tile_1.png-afa538c3d3472f7dcf36d0e7b12e6958.s3tc.ctex"
+uid="uid://c5i1xpr783gfu"
+path.s3tc="res://.godot/imported/FloorTile_1.png-7b1cf29d2c828f24faceff2145602ee1.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "c41ace10d122edc37d8df723e5954a3a"
+"md5": "cf57d4dddb49b84eabff7fdcb93d6f3b"
 }
 
 [deps]
 
-source_file="res://Assets/Wall Tile_1.png"
-dest_files=["res://.godot/imported/Wall Tile_1.png-afa538c3d3472f7dcf36d0e7b12e6958.s3tc.ctex"]
+source_file="res://Assets/3DTiles/FloorTile_1.png"
+dest_files=["res://.godot/imported/FloorTile_1.png-7b1cf29d2c828f24faceff2145602ee1.s3tc.ctex"]
 
 [params]
 

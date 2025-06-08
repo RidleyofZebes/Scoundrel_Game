@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bolfuaj8c8nri"
-path="res://.godot/imported/slime.png-3ec58f43c16f73dc506331217e4bd7a8.ctex"
+uid="uid://dra8lk8wg8hx5"
+path="res://.godot/imported/bandit2.png-58fc674a78a9c03c8fda6184da6a06bd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/slime.png"
-dest_files=["res://.godot/imported/slime.png-3ec58f43c16f73dc506331217e4bd7a8.ctex"]
+source_file="res://Assets/Sprites/bandit2.png"
+dest_files=["res://.godot/imported/bandit2.png-58fc674a78a9c03c8fda6184da6a06bd.ctex"]
 
 [params]
 

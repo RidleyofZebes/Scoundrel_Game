@@ -2,17 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://nq1s7nycovgh"
-path.s3tc="res://.godot/imported/bandit.png-bda8dfb934a03f73f091ddf1dcf4cf28.s3tc.ctex"
+uid="uid://df6mxvofwarh8"
+path.s3tc="res://.godot/imported/FloorTile_0.png-86e6baa7efa7932fbe5876191b9270f7.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
+generator_parameters={
+"md5": "6a7ca7d79237612bc0928d96dfb1cf97"
+}
 
 [deps]
 
-source_file="res://Assets/bandit.png"
-dest_files=["res://.godot/imported/bandit.png-bda8dfb934a03f73f091ddf1dcf4cf28.s3tc.ctex"]
+source_file="res://Assets/3DTiles/FloorTile_0.png"
+dest_files=["res://.godot/imported/FloorTile_0.png-86e6baa7efa7932fbe5876191b9270f7.s3tc.ctex"]
 
 [params]
 

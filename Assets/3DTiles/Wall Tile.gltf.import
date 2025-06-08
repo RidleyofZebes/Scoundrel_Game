@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b0w7ejeqjgcuf"
-path="res://.godot/imported/Wall Tile.gltf-2da364ae77ff82eddab86419236bed22.scn"
+path="res://.godot/imported/Wall Tile.gltf-891be55f0847e0a00e72fa3f069a70c8.scn"
 
 [deps]
 
-source_file="res://Assets/Wall Tile.gltf"
-dest_files=["res://.godot/imported/Wall Tile.gltf-2da364ae77ff82eddab86419236bed22.scn"]
+source_file="res://Assets/3DTiles/Wall Tile.gltf"
+dest_files=["res://.godot/imported/Wall Tile.gltf-891be55f0847e0a00e72fa3f069a70c8.scn"]
 
 [params]
 

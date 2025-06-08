@@ -59,7 +59,7 @@ func draw_minimap():
 		# Create sprite if it doesn't exist
 		if not tile_sprites.has(pos):
 			var dot = Sprite2D.new()
-			dot.texture = preload("res://Assets/white_pixel.png")
+			dot.texture = preload("res://Assets/Interface/white_pixel.png")
 			dot.scale = Vector2(tile_size, tile_size)
 			dot.position = Vector2(pos.x * tile_size, pos.y * tile_size)
 			tilemap_layer.add_child(dot)
@@ -87,7 +87,7 @@ func update_entities():
 		child.queue_free()
 	
 	var player_icon = Sprite2D.new()
-	player_icon.texture = preload("res://Assets/player.png")
+	player_icon.texture = preload("res://Assets/Interface/player.png")
 	player_icon.position = Vector2(player_grid_pos.x * tile_size, player_grid_pos.y * tile_size)
 	# Rotation bandaid:
 	var minimap_facing = player_facing
@@ -100,6 +100,6 @@ func update_entities():
 	
 	for ent in entity_positions:
 		var icon = Sprite2D.new()
-		icon.texture = preload("res://Assets/player.png")
+		icon.texture = preload("res://Assets/Interface/player.png")
 		icon.position = Vector2(ent.x * tile_size, ent.y * tile_size)
 		entities_layer.add_child(icon)

@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cgi45f5uepd87"]
 
 [ext_resource type="Script" uid="uid://chr51xeb5hkdn" path="res://Scripts/Minimap.gd" id="1_30a8r"]
-[ext_resource type="Texture2D" uid="uid://cgduxs7htho4" path="res://Assets/map_stencil.png" id="1_xufwn"]
+[ext_resource type="Texture2D" uid="uid://cgduxs7htho4" path="res://Assets/Interface/map_stencil.png" id="1_xufwn"]
 
 [node name="2dMinimap" type="TextureRect" node_paths=PackedStringArray("tilemap_layer", "entities_layer")]
 self_modulate = Color(0.129412, 0.129412, 0.129412, 0.890196)

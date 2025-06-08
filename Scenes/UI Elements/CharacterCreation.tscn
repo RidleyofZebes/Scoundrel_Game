@@ -1,9 +1,9 @@
 [gd_scene load_steps=5 format=3 uid="uid://cd4cu4mwe5gtw"]
 
-[ext_resource type="Texture2D" uid="uid://b4bs36a7bgafl" path="res://Assets/male.png" id="1_wy1n4"]
-[ext_resource type="Texture2D" uid="uid://c7gjomwjyn027" path="res://Assets/female.png" id="2_e327y"]
-[ext_resource type="Texture2D" uid="uid://d0iokwtl5nj5l" path="res://Assets/button_down.png" id="3_bqqo2"]
-[ext_resource type="Texture2D" uid="uid://lrdooo2qphou" path="res://Assets/button_up.png" id="4_55cfx"]
+[ext_resource type="Texture2D" uid="uid://b4bs36a7bgafl" path="res://Assets/Interface/male.png" id="1_wy1n4"]
+[ext_resource type="Texture2D" uid="uid://c7gjomwjyn027" path="res://Assets/Interface/female.png" id="2_e327y"]
+[ext_resource type="Texture2D" uid="uid://d0iokwtl5nj5l" path="res://Assets/Interface/button_down.png" id="3_bqqo2"]
+[ext_resource type="Texture2D" uid="uid://lrdooo2qphou" path="res://Assets/Interface/button_up.png" id="4_55cfx"]
 
 [node name="CharacterCreation" type="CanvasLayer"]
 

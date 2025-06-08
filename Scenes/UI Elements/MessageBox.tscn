@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://ddbpj3eu4m8i8"]
 
 [ext_resource type="Script" uid="uid://bcvbg6m7xjhy" path="res://Scripts/MessageBox.gd" id="1_1huvh"]
-[ext_resource type="FontFile" uid="uid://dxi5ehx81n7ss" path="res://Assets/Alkhemikal.ttf" id="2_7i60w"]
+[ext_resource type="FontFile" uid="uid://dxi5ehx81n7ss" path="res://Assets/Fonts/Alkhemikal.ttf" id="2_7i60w"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_66h4w"]
 blend_mode = 3

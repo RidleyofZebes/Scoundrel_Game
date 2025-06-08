@@ -4,7 +4,7 @@ enum CursorMode { DEFAULT, LOOK, ATTACK, INTERACT, MOVE}
 var current_mode: CursorMode = CursorMode.DEFAULT
 
 func _ready():
-	Input.set_custom_mouse_cursor(preload("res://Assets/cursor_gauntlet.png"))
+	Input.set_custom_mouse_cursor(preload("res://Assets/Cursors/cursor_gauntlet.png"))
 
 func _unhandled_input(event):
 	if event.is_action_pressed("cursor_mode_look"):
@@ -20,7 +20,7 @@ func set_cursor_mode(mode):
 	current_mode = mode
 	
 	# Look Cursor setup
-	var examine_cursor_image = preload("res://Assets/cursor_eye.png")
+	var examine_cursor_image = preload("res://Assets/Cursors/cursor_eye.png")
 	var image_size = examine_cursor_image.get_size()
 	var hotspot = image_size / 2
 	
@@ -28,10 +28,10 @@ func set_cursor_mode(mode):
 		CursorMode.LOOK:
 			Input.set_custom_mouse_cursor(examine_cursor_image, Input.CURSOR_ARROW, hotspot)
 		CursorMode.ATTACK:
-			Input.set_custom_mouse_cursor(preload("res://Assets/cursor_gauntlet.png"))
+			Input.set_custom_mouse_cursor(preload("res://Assets/Cursors/cursor_gauntlet.png"))
 		CursorMode.INTERACT:
-			Input.set_custom_mouse_cursor(preload("res://Assets/cursor_gauntlet.png"))
+			Input.set_custom_mouse_cursor(preload("res://Assets/Cursors/cursor_gauntlet.png"))
 		CursorMode.MOVE:
-			Input.set_custom_mouse_cursor(preload("res://Assets/cursor_gauntlet.png"))
+			Input.set_custom_mouse_cursor(preload("res://Assets/Cursors/cursor_gauntlet.png"))
 		_:
 			Input.set_custom_mouse_cursor(null)

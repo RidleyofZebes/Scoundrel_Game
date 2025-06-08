@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c6v7ey3dbtwri"
-path="res://.godot/imported/cursor_gauntlet.png-e5b2c704f2e38c84c71a2300321f6397.ctex"
+uid="uid://bd686jdbjs6w1"
+path="res://.godot/imported/cursor_eye.png-1c9658ea68690324394cf7d739673714.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/cursor_gauntlet.png"
-dest_files=["res://.godot/imported/cursor_gauntlet.png-e5b2c704f2e38c84c71a2300321f6397.ctex"]
+source_file="res://Assets/Cursors/cursor_eye.png"
+dest_files=["res://.godot/imported/cursor_eye.png-1c9658ea68690324394cf7d739673714.ctex"]
 
 [params]
 

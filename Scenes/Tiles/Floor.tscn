@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=4 uid="uid://c1hr5l8n0gnxm"]
 
 [ext_resource type="Script" uid="uid://bh63bv060u82p" path="res://Scripts/TileBase.gd" id="1_3orql"]
-[ext_resource type="PackedScene" uid="uid://du1w8yp40is77" path="res://Assets/FloorTile.glb" id="2_3orql"]
+[ext_resource type="PackedScene" uid="uid://du1w8yp40is77" path="res://Assets/3DTiles/FloorTile.glb" id="2_3orql"]
 [ext_resource type="Shader" uid="uid://dcqokx00yigj1" path="res://Assets/Shaders/GlowOverlay.gdshader" id="3_qpglv"]
 [ext_resource type="Material" uid="uid://bojo6flogf15q" path="res://Assets/Shaders/GlowMaterial.material" id="4_06tqw"]
 

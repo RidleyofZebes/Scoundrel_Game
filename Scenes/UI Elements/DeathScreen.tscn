@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://d3pjmvoqvakwn"]
 
 [ext_resource type="Script" uid="uid://35lga8d3p310" path="res://Scripts/death_screen.gd" id="1_n64ax"]
-[ext_resource type="FontFile" uid="uid://dxi5ehx81n7ss" path="res://Assets/Alkhemikal.ttf" id="3_j585w"]
+[ext_resource type="FontFile" uid="uid://dxi5ehx81n7ss" path="res://Assets/Fonts/Alkhemikal.ttf" id="3_j585w"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_x06ds"]
 font = ExtResource("3_j585w")

@@ -2,20 +2,17 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bp5ubcey8oevm"
-path.s3tc="res://.godot/imported/Wall Tile_0.png-2685a3f2cf36db677b6d25e335247bcb.s3tc.ctex"
+uid="uid://bcyuu6tghsgq6"
+path.s3tc="res://.godot/imported/spectre.png-b3593452448b2344bcaebc50e6a703e7.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
-generator_parameters={
-"md5": "c15771d14a2f2b3d8f8bf721b46f9ae7"
-}
 
 [deps]
 
-source_file="res://Assets/Wall Tile_0.png"
-dest_files=["res://.godot/imported/Wall Tile_0.png-2685a3f2cf36db677b6d25e335247bcb.s3tc.ctex"]
+source_file="res://Assets/Sprites/spectre.png"
+dest_files=["res://.godot/imported/spectre.png-b3593452448b2344bcaebc50e6a703e7.s3tc.ctex"]
 
 [params]
 
