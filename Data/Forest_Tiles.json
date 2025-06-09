@@ -3,21 +3,21 @@
 	"name": "Impenetrable Growth",
 	"icon": "forest_wall",
 	"examine": "The forest sprawls away into a dense thicket, allowing through neither sight nor light.",
-	"color": [48, 48, 48],
+	"color": [9, 59, 22],
 	"isWall": 1
   },
   "1": {
 	"name": "Forest Floor",
 	"icon": "forest_floor",
 	"examine": "Fallen leaves, twigs, and forest detritus have accumulated in a soft pad lining the ground here.",
-	"color": [169, 169, 169],
+	"color": [17, 108, 42],
 	"isWall": 0
   },
   "2": {
 	"name": "Stand of Trees",
 	"icon": "forest_trees",
 	"examine": "A dense stand of trees: inconsequential to forest critters, but a solid deterrent to you.",
-	"color": [0, 0, 0],
+	"color": [5, 78, 34],
 	"isWall": 2
   }
 }

@@ -114,18 +114,33 @@ func end_player_turn():
 		if child.has_method("take_turn"):
 			child.active = true
 			
-func generate_world(map_type: String, steps: int, enemies: int) -> void:
+func generate_world(map_type: String, variant: String, steps: int, enemies: int) -> void:
+	var env_resource: Environment
 	match map_type:
 		"dungeon":
+			match variant:
+				"pitchblack":
+					env_resource = preload("res://Scenes/Environments/Dungeon_Pitchblack.tres")
+				_:
+					push_warning("Unknown environment, using default!")
+					return
 			load_dungeon_tiles()
 			map = MapGenerator.drunken_walk(steps)
 		"forest":
+			match variant:
+				"sunny":
+					env_resource = preload("res://Scenes/Environments/Forest_Sunny.tres")
+				"moonlit":
+					env_resource = preload("res://Scenes/Environments/Forest_Moonlit.tres")
+				_:
+					env_resource = preload("res://Scenes/Environments/Forest_Sunny.tres")
 			load_forest_tiles()
 			map = MapGenerator.drunken_forest(steps)
 		_:
 			push_error("Unknown map type: " + map_type)
 			return
 			
+	$WorldEnvironment.environment = env_resource
 	generate_map()
 	spawn_player()
 	spawn_enemies(enemies)
@@ -137,4 +152,4 @@ func generate_world(map_type: String, steps: int, enemies: int) -> void:
 	
 func _ready() -> void:
 	MessageBox.show()
-	generate_world("forest", 2400, 10) # TODO: Take two inputs, map_type and steps
+	generate_world("forest", "moonlit", 2400, 10) # TODO: Take two inputs, map_type and steps

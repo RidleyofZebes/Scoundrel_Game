@@ -66,26 +66,43 @@ func drunken_walk(step_target: int) -> Array:
 	return map
 	
 func drunken_forest(step_target: int) -> Array:
-	var map = drunken_walk(step_target)
+	var base_map = drunken_walk(step_target)
 
-	var height = map.size()
-	var width = map[0].size()
-
+	var height = base_map.size()
+	var width = base_map[0].size()
+	var padded_map = []
+	
+	var row = []
+	row.resize(width + 2)
+	row.fill(0)
+	padded_map.append(row)
+	
 	for y in range(height):
+		var new_row = []
+		new_row.append(0)
 		for x in range(width):
-			if map[y][x] != 0:
+			new_row.append(base_map[y][x])
+		new_row.append(0)
+		padded_map.append(new_row)
+	
+	var padded_height = padded_map.size()
+	var padded_width = padded_map[0].size()
+	
+	for y in range(padded_height):
+		for x in range(padded_width):
+			if padded_map[y][x] != 0:
 				continue
-
+				
 			for dy in range(-1, 2):
 				for dx in range(-1, 2):
 					var ny = y + dy
 					var nx = x + dx
 
-					if ny < 0 or ny >= height or nx < 0 or nx >= width:
+					if ny < 0 or ny >= padded_height or nx < 0 or nx >= padded_width:
 						continue
 
-					if map[ny][nx] == 1:
-						map[y][x] = 2
+					if padded_map[ny][nx] == 1:
+						padded_map[y][x] = 2
 						break
 
-	return map
+	return padded_map
