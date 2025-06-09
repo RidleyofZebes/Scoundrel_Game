@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bp5ubcey8oevm"
-path.s3tc="res://.godot/imported/Wall Tile_0.png-766f67ddb1599e75fb474f2c314e2c17.s3tc.ctex"
+uid="uid://dkpo8o2a6lcsc"
+path.s3tc="res://.godot/imported/ForestTile_1.png-d5b8a6ba3fc1184e6917811865907abc.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "c15771d14a2f2b3d8f8bf721b46f9ae7"
+"md5": "dd94469cc9f41a68f84f8969a0d97058"
 }
 
 [deps]
 
-source_file="res://Assets/3DTiles/Wall Tile_0.png"
-dest_files=["res://.godot/imported/Wall Tile_0.png-766f67ddb1599e75fb474f2c314e2c17.s3tc.ctex"]
+source_file="res://Assets/3DTiles/Forest/ForestTile_1.png"
+dest_files=["res://.godot/imported/ForestTile_1.png-d5b8a6ba3fc1184e6917811865907abc.s3tc.ctex"]
 
 [params]
 

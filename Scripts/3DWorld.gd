@@ -1,48 +1,72 @@
 extends Node3D
 
-@export var floor_tile: PackedScene
-@export var wall_tile:  PackedScene
-@export var water_tile: PackedScene
 @export var player_entity: PackedScene
 @export var enemy_entity: PackedScene
 @export var minimap_path: NodePath
 @onready var tile_root   = $TileRoot
 @onready var entity_root = $EntityRoot
 
-var map = MapGenerator.drunken_walk(2400)
+# var map = MapGenerator.drunken_walk(2400)
+var map = MapGenerator.drunken_forest(2400)
 # var map = MapGenerator.void_platform(32) # debug room
+
+var tile_scenes: Dictionary = {}
 var spawn_tiles = []
 var occupied_tiles: Dictionary = {}
 var player : Node3D
 var ui : Node = null
 
+func load_dungeon_tiles():
+	tile_scenes = {
+		0: preload("res://Scenes/Tiles/Dungeon/Dungeon_Wall.tscn"),
+		1: preload("res://Scenes/Tiles/Dungeon/Dungeon_Floor.tscn"),
+#		2: preload(),
+#		3: preload(),
+	}
+	GlobalTileData.load_tiles("res://Data/Dungeon_Tiles.json")
+
+func load_forest_tiles():
+	tile_scenes = {
+		0: preload("res://Scenes/Tiles/Forest/Forest_Wall.tscn"),
+		1: preload("res://Scenes/Tiles/Forest/Forest_Floor.tscn"),
+		2: preload("res://Scenes/Tiles/Forest/Forest_Trees.tscn"),
+#		3: preload(),
+	}
+	GlobalTileData.load_tiles("res://Data/Forest_Tiles.json")
+
 func generate_map():
 	spawn_tiles.clear()
+	GlobalTileData.load_tiles()
 	var tile_pos
-	var scene
 	for y in range(map.size()):
 		for x in range(map[0].size()):
-			if map[y][x] == 0:
-				scene = wall_tile
-				tile_pos = Vector3(x, 0, y)
-			elif map[y][x] == 1:
-				scene = floor_tile
-				tile_pos = Vector3(x, -0.5, y)
-				spawn_tiles.append(Vector2i(x, y))
-			elif map[y][x] == 2: # Water tile for later
-				pass
-			var tile: TileBase = scene.instantiate()
-			tile.position = tile_pos
-			if tile is TileBase:
-				tile.tile_id = map[y][x]
-			tile_root.add_child(tile)
+			var tile_id = map[y][x]
+			if tile_scenes.has(tile_id):
+				var scene = tile_scenes[tile_id]
+				var tile: TileBase = scene.instantiate()
+				tile.position = Vector3(x, -0.5, y)
+				tile.tile_id = tile_id
+				if tile_id == 2:  # Tree cluster tile
+					var rng = RandomNumberGenerator.new()
+					rng.randomize()
+					var rotations = [0, 90, 180, 270]
+					var random_angle = rotations[rng.randi_range(0, 3)]
+					tile.rotation_degrees.y = random_angle
+				tile_root.add_child(tile)
+				if tile_id == 1:
+					spawn_tiles.append(Vector2i(x, y))
+	print("Generated ", spawn_tiles.size(), " floor tiles.")
 
 func spawn_player():
 	player = player_entity.instantiate()
 	
 	var random = RandomNumberGenerator.new()
 	random.randomize()
-	
+
+	if spawn_tiles.is_empty():
+		push_error("No spawn tiles available! Check generate_map() logic.")
+		return	
+
 	var player_spawn = spawn_tiles[random.randi_range(0, spawn_tiles.size() -1)]
 	occupied_tiles[player_spawn] = player
 	player.grid_x = player_spawn[0]
@@ -89,19 +113,28 @@ func end_player_turn():
 	for child in entity_root.get_children():
 		if child.has_method("take_turn"):
 			child.active = true
-
-func _ready() -> void:
-	MessageBox.show()
-	generate_map() # TODO: Take two inputs, map_type and steps
+			
+func generate_world(map_type: String, steps: int, enemies: int) -> void:
+	match map_type:
+		"dungeon":
+			load_dungeon_tiles()
+			map = MapGenerator.drunken_walk(steps)
+		"forest":
+			load_forest_tiles()
+			map = MapGenerator.drunken_forest(steps)
+		_:
+			push_error("Unknown map type: " + map_type)
+			return
+			
+	generate_map()
 	spawn_player()
-	spawn_enemies(10)
+	spawn_enemies(enemies)
+	
 	var minimap = get_node(minimap_path)
-	print(minimap)
 	minimap.set_map_data(map)
 	minimap.set_player_pos(Vector2i(player.grid_x, player.grid_y), player.facing)
 	MessageBox.say("You venture forth into the unknown...")
-	#minimap.set_entity_positions(get_tree().get_node("Main/EntityRoot").get_children().filter(is_enemy))
-
-## Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta: float) -> void:
-	#pass
+	
+func _ready() -> void:
+	MessageBox.show()
+	generate_world("forest", 2400, 10) # TODO: Take two inputs, map_type and steps

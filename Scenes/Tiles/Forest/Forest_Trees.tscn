@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://crs1wgiajgmqf"]
+
+[ext_resource type="PackedScene" uid="uid://cfebutne2pe0m" path="res://Scenes/Tiles/_TileBase.tscn" id="1_icmxj"]
+[ext_resource type="PackedScene" uid="uid://b83yb5gfy2guh" path="res://Assets/3DTiles/Forest/ForestTile.gltf" id="2_bbk8k"]
+
+[node name="Forrest_Trees" instance=ExtResource("1_icmxj")]
+
+[node name="blockbench_export" parent="." index="0" instance=ExtResource("2_bbk8k")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)

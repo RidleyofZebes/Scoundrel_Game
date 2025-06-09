@@ -1,8 +1,8 @@
 [gd_scene load_steps=11 format=3 uid="uid://ceudj14pim2r6"]
 
 [ext_resource type="Script" uid="uid://dqfohnlj820cf" path="res://Scripts/3DWorld.gd" id="1_1c70s"]
-[ext_resource type="PackedScene" uid="uid://c1hr5l8n0gnxm" path="res://Scenes/Tiles/Floor.tscn" id="2_k83wk"]
-[ext_resource type="PackedScene" uid="uid://d21is7jccs2uj" path="res://Scenes/Tiles/Wall.tscn" id="3_64b26"]
+[ext_resource type="PackedScene" uid="uid://c1hr5l8n0gnxm" path="res://Scenes/Tiles/Dungeon/Dungeon_Floor.tscn" id="2_k83wk"]
+[ext_resource type="PackedScene" uid="uid://d21is7jccs2uj" path="res://Scenes/Tiles/Dungeon/Dungeon_Wall.tscn" id="3_64b26"]
 [ext_resource type="PackedScene" uid="uid://cp3skl0luvayg" path="res://Scenes/Tiles/Water.tscn" id="4_11oji"]
 [ext_resource type="PackedScene" uid="uid://c68hiys8qv8au" path="res://Scenes/Entities/Player.tscn" id="5_k83wk"]
 [ext_resource type="PackedScene" uid="uid://b0dmxepnleixh" path="res://Scenes/Entities/Enemy.tscn" id="6_k83wk"]

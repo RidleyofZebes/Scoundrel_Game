@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://b0w7ejeqjgcuf"
-path="res://.godot/imported/Wall Tile.gltf-891be55f0847e0a00e72fa3f069a70c8.scn"
+uid="uid://p86edryj0vjn"
+path="res://.godot/imported/ForestFloor.gltf-436a9d213461e2c560e9a9ad253d54e2.scn"
 
 [deps]
 
-source_file="res://Assets/3DTiles/Wall Tile.gltf"
-dest_files=["res://.godot/imported/Wall Tile.gltf-891be55f0847e0a00e72fa3f069a70c8.scn"]
+source_file="res://Assets/3DTiles/Forest/ForestFloor.gltf"
+dest_files=["res://.godot/imported/ForestFloor.gltf-436a9d213461e2c560e9a9ad253d54e2.scn"]
 
 [params]
 

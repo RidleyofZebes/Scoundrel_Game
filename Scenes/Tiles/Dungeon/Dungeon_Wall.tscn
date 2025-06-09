@@ -1,11 +1,13 @@
 [gd_scene load_steps=9 format=4 uid="uid://d21is7jccs2uj"]
 
-[ext_resource type="PackedScene" uid="uid://b0w7ejeqjgcuf" path="res://Assets/3DTiles/Wall Tile.gltf" id="1_cu1n4"]
-[ext_resource type="Script" uid="uid://bh63bv060u82p" path="res://Scripts/TileBase.gd" id="1_v4x0e"]
-[ext_resource type="Texture2D" uid="uid://bp5ubcey8oevm" path="res://Assets/3DTiles/Wall Tile_0.png" id="3_y3mkp"]
-[ext_resource type="Material" uid="uid://bojo6flogf15q" path="res://Assets/Shaders/GlowMaterial.material" id="4_6vlbe"]
+[ext_resource type="Script" uid="uid://bh63bv060u82p" path="res://Scripts/TileBase.gd" id="1_1slpk"]
+[ext_resource type="Material" uid="uid://bojo6flogf15q" path="res://Assets/Shaders/GlowMaterial.material" id="2_4vtdw"]
+[ext_resource type="PackedScene" uid="uid://cfbmgsmwh6xl4" path="res://Assets/3DTiles/Dungeon/WallTile.gltf" id="3_ppy0x"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ybexf"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_6vlbe"]
+load_path = "res://.godot/imported/Wall Tile_0.png-9ad8661495aa5977ec4e3761c8af9816.s3tc.ctex"
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b4akb"]
 resource_name = "material_0"
@@ -13,7 +15,7 @@ transparency = 2
 alpha_scissor_threshold = 0.05
 alpha_antialiasing_mode = 0
 cull_mode = 2
-albedo_texture = ExtResource("3_y3mkp")
+albedo_texture = SubResource("CompressedTexture2D_6vlbe")
 texture_filter = 0
 texture_repeat = false
 
@@ -50,20 +52,20 @@ blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_lvw82")
 
 [node name="Wall" type="Node3D"]
-script = ExtResource("1_v4x0e")
+script = ExtResource("1_1slpk")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
 shape = SubResource("BoxShape3D_ybexf")
 
-[node name="blockbench_export" parent="." instance=ExtResource("1_cu1n4")]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, -0.5, 0)
-
 [node name="GlowOverlay" type="MeshInstance3D" parent="."]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, -0.5, 0)
 visible = false
 mesh = SubResource("ArrayMesh_vorx7")
-surface_material_override/0 = ExtResource("4_6vlbe")
+surface_material_override/0 = ExtResource("2_4vtdw")
 
-[editable path="blockbench_export"]
+[node name="blockbench_export2" parent="." instance=ExtResource("3_ppy0x")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, -0.5, 0)
+
+[editable path="blockbench_export2"]
