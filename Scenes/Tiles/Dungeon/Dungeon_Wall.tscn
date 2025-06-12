@@ -7,7 +7,6 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_ybexf"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_6vlbe"]
-load_path = "res://.godot/imported/Wall Tile_0.png-9ad8661495aa5977ec4e3761c8af9816.s3tc.ctex"
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b4akb"]
 resource_name = "material_0"

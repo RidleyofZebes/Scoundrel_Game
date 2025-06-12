@@ -1,6 +1,14 @@
-[gd_scene load_steps=2 format=3 uid="uid://cfebutne2pe0m"]
+[gd_scene load_steps=4 format=3 uid="uid://cfebutne2pe0m"]
 
 [ext_resource type="Script" uid="uid://bh63bv060u82p" path="res://Scripts/TileBase.gd" id="1_je56u"]
+[ext_resource type="Material" uid="uid://pkhq3irbscbk" path="res://Assets/Shaders/GlowOverlay.tres" id="2_yljm6"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_044w1"]
 
 [node name="TileBase" type="Node3D"]
 script = ExtResource("1_je56u")
+
+[node name="GlowOverlay" type="MeshInstance3D" parent="."]
+visible = false
+mesh = SubResource("QuadMesh_044w1")
+surface_material_override/0 = ExtResource("2_yljm6")

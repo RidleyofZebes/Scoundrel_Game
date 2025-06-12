@@ -102,6 +102,7 @@ func spawn_enemies(n):
 		e.position = Vector3(pick.x, 0, pick.y)
 		e.is_enemy = true
 		e.player = player
+		e.add_to_group("enemies")
 		e.world = self
 		var enemy_id = GlobalEnemyData.get_random_enemy()
 		e.enemy_id = enemy_id
@@ -113,6 +114,22 @@ func end_player_turn():
 	for child in entity_root.get_children():
 		if child.has_method("take_turn"):
 			child.active = true
+	await get_tree().process_frame
+	update_minimap_entities()
+			
+func update_minimap_entities():
+	var visible_positions = []
+	var minimap = get_node(minimap_path)
+	var visible = minimap.visible_tiles.keys()
+	
+	for e in get_tree().get_nodes_in_group("enemies"):
+		if not is_instance_valid(e) or e.get_parent() == null:
+			continue
+		var pos = Vector2i(e.grid_x, e.grid_y)
+		if visible.has(pos):
+			visible_positions.append(pos)
+	
+	minimap.set_entities(visible_positions)
 			
 func generate_world(map_type: String, variant: String, steps: int, enemies: int) -> void:
 	var env_resource: Environment
@@ -148,6 +165,7 @@ func generate_world(map_type: String, variant: String, steps: int, enemies: int)
 	var minimap = get_node(minimap_path)
 	minimap.set_map_data(map)
 	minimap.set_player_pos(Vector2i(player.grid_x, player.grid_y), player.facing)
+	update_minimap_entities()
 	MessageBox.say("You venture forth into the unknown...")
 	
 func _ready() -> void:

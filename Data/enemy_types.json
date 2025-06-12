@@ -43,7 +43,7 @@
 	"name":      "Ogre",
 	"mobtype":   "humanoid",
 	"examine":   "Tall as a tree and large as a boulder, the ogre towers over the landscape. Pale blue-green lips draw back from yellowed, blunt teeth in a snarl that proclaims all around it as possessions.",
-	"sprite":    "res://Assets/Sprites/pectre.png",
+	"sprite":    "res://Assets/Sprites/spectre.png",
 	"hp":        50,
 	"weapon":    "Tree-limb club",
 	"damage":    [3, 9],

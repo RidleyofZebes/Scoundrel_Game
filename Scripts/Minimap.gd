@@ -14,10 +14,24 @@ var visible_tiles := {}
 var player_grid_pos = Vector2i.ZERO
 var player_facing: int = 0
 var entity_positions = []
+var base_tile_size = 32
 var tile_size = 32
+var current_zoom := 1.0
 
 func set_map_data(data):
 	map_data = data
+	
+func set_zoom(factor: float):
+	current_zoom = clamp(factor, 0.25, 2.0)
+	tile_size = base_tile_size * current_zoom
+	
+	for pos in tile_sprites.keys():
+		var sprite = tile_sprites[pos]
+		sprite.scale = Vector2(tile_size, tile_size)
+		sprite.position = Vector2(pos.x * tile_size, pos.y * tile_size)
+		
+	update_entities()
+	center_minimap_on_player()
 	
 func set_player_pos(grid_pos, facing):
 	player_grid_pos = grid_pos
@@ -88,6 +102,7 @@ func update_entities():
 	
 	var player_icon = Sprite2D.new()
 	player_icon.texture = preload("res://Assets/Interface/player.png")
+	player_icon.scale = Vector2(tile_size, tile_size) / base_tile_size
 	player_icon.position = Vector2(player_grid_pos.x * tile_size, player_grid_pos.y * tile_size)
 	# Rotation bandaid:
 	var minimap_facing = player_facing
@@ -100,6 +115,16 @@ func update_entities():
 	
 	for ent in entity_positions:
 		var icon = Sprite2D.new()
-		icon.texture = preload("res://Assets/Interface/player.png")
+		icon.texture = preload("res://Assets/Interface/enemy_marker.png")
+		icon.scale = Vector2(tile_size, tile_size) / base_tile_size
 		icon.position = Vector2(ent.x * tile_size, ent.y * tile_size)
 		entities_layer.add_child(icon)
+		
+func _gui_input(event):
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			set_zoom(current_zoom + 0.25)
+			accept_event()  # Prevents event from propagating to world
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			set_zoom(current_zoom - 0.25)
+			accept_event()

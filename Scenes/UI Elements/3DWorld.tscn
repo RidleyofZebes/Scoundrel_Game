@@ -1,17 +1,17 @@
 [gd_scene load_steps=8 format=3 uid="uid://ceudj14pim2r6"]
 
 [ext_resource type="Script" uid="uid://dqfohnlj820cf" path="res://Scripts/3DWorld.gd" id="1_1c70s"]
+[ext_resource type="PackedScene" uid="uid://c68hiys8qv8au" path="res://Scenes/Entities/Player.tscn" id="2_1c70s"]
+[ext_resource type="PackedScene" uid="uid://b0dmxepnleixh" path="res://Scenes/Entities/Enemy.tscn" id="3_k83wk"]
 [ext_resource type="Environment" uid="uid://bsvwtslrnq453" path="res://Scenes/Environments/Dungeon_Pitchblack.tres" id="4_1c70s"]
-[ext_resource type="PackedScene" uid="uid://c68hiys8qv8au" path="res://Scenes/Entities/Player.tscn" id="5_k83wk"]
-[ext_resource type="PackedScene" uid="uid://b0dmxepnleixh" path="res://Scenes/Entities/Enemy.tscn" id="6_k83wk"]
 [ext_resource type="PackedScene" uid="uid://tvuvgm8bi5l7" path="res://Scenes/UI Elements/EntityBoxes/TileRoot.tscn" id="6_t75jn"]
 [ext_resource type="PackedScene" uid="uid://d38gpe7kq5x0e" path="res://Scenes/UI Elements/EntityBoxes/EntityRoot.tscn" id="7_d71od"]
 [ext_resource type="Script" uid="uid://8xxq7r08opy6" path="res://Scripts/HoverDetector.gd" id="9_64b26"]
 
 [node name="3dWorld" type="Node3D"]
 script = ExtResource("1_1c70s")
-player_entity = ExtResource("5_k83wk")
-enemy_entity = ExtResource("6_k83wk")
+player_entity = ExtResource("2_1c70s")
+enemy_entity = ExtResource("3_k83wk")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource("4_1c70s")
