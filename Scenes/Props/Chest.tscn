@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://dkch2evvy8gwq"]
+
+[ext_resource type="Script" uid="uid://bw1tmpfi4mov2" path="res://Scripts/Chest.gd" id="1_2rihf"]
+[ext_resource type="PackedScene" uid="uid://cd417684mks3n" path="res://Assets/Models/Chest.gltf" id="1_8mf1v"]
+
+[node name="Chest" type="Node3D"]
+script = ExtResource("1_2rihf")
+
+[node name="blockbench_export" parent="." instance=ExtResource("1_8mf1v")]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, -0.5, 0)
+
+[editable path="blockbench_export"]

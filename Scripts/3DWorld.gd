@@ -3,6 +3,7 @@ extends Node3D
 @export var player_entity: PackedScene
 @export var enemy_entity: PackedScene
 @export var minimap_path: NodePath
+@export var chest_scene: PackedScene  # Temporary until I figure this out. Can't just have a line for every one of the damned things.
 @onready var tile_root   = $TileRoot
 @onready var entity_root = $EntityRoot
 @onready var loading_screen := $"../../../LoadingScreen"
@@ -115,6 +116,23 @@ func spawn_enemies(n):
 		occupied_tiles[pick] = e
 		e.setup_light()
 		
+func spawn_chests(amount: int = 5):
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	
+	for i in range(amount):
+		var chest = chest_scene.instantiate()
+		
+		var pos: Vector2i = spawn_tiles[rng.randi_range(0, spawn_tiles.size() - 1)]
+		if occupied_tiles.has(pos):
+			continue
+			
+		chest.position = Vector3(pos.x, 0, pos.y)
+		chest.grid_x = pos.x
+		chest.grid_y = pos.y
+		occupied_tiles[pos] = chest
+		tile_root.add_child(chest)
+		
 func end_player_turn():
 	for child in entity_root.get_children():
 		if child.has_method("take_turn"):
@@ -169,6 +187,7 @@ func generate_world(map_type: String, variant: String, steps: int, enemies: int)
 	generate_map()
 	spawn_player()
 	spawn_enemies(enemies)
+	spawn_chests(50)
 	
 	var minimap = get_node(minimap_path)
 	minimap.set_map_data(map)

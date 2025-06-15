@@ -48,8 +48,10 @@ func try_move(dx: int, dy: int) -> bool:
 		print("can't move!")
 		return false
 	if world.occupied_tiles.has(target_pos):
-		print("There's already an entity there.")
-		return false
+		var blocker = world.occupied_tiles[target_pos]
+		if blocker.has_method("is_blocking") and blocker.is_blocking():
+			print("There's a %s blocking the way." % blocker.name)
+			return false
 		
 	var old_pos = Vector2i(grid_x, grid_y)
 	world.occupied_tiles.erase(old_pos)
@@ -96,6 +98,9 @@ func take_damage(amount):
 	health -= amount
 	if health <= 0:
 		call_deferred("die")
+		
+func is_blocking() -> bool:
+	return true  # Can be toggled for ghosts etc.
 
 func die():
 	if not is_enemy:
