@@ -7,6 +7,7 @@
 blend_mode = 3
 
 [sub_resource type="Gradient" id="Gradient_66h4w"]
+offsets = PackedFloat32Array(0.212245, 1)
 colors = PackedColorArray(0, 0, 0, 1, 1, 1, 1, 0)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_7qex8"]
@@ -22,13 +23,13 @@ default_font_size = 28
 script = ExtResource("1_1huvh")
 
 [node name="LogBox" type="PanelContainer" parent="."]
-custom_minimum_size = Vector2(0, 150)
+custom_minimum_size = Vector2(0, 100)
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 10.0
-offset_top = -160.0
+offset_top = -120.0
 offset_right = -10.0
 offset_bottom = -10.0
 grow_horizontal = 2
@@ -47,12 +48,12 @@ theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
 [node name="ScrollContainer" type="ScrollContainer" parent="LogBox/TextMargin"]
-custom_minimum_size = Vector2(0, 150)
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 horizontal_scroll_mode = 0
 
 [node name="LogList" type="VBoxContainer" parent="LogBox/TextMargin/ScrollContainer"]
-custom_minimum_size = Vector2(0, 150)
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 size_flags_horizontal = 3
 theme = SubResource("Theme_7qex8")

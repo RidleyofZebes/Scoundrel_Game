@@ -48,7 +48,7 @@ func _process(delta):
 
 			if not moving:
 				if try_move(dir.x, dir.y):
-					reveal_tiles(minimap)
+					reveal_all_minimaps()
 					update_minimap_pos()
 					world.end_player_turn()
 		else:
@@ -56,7 +56,7 @@ func _process(delta):
 			if input_repeat_timer <= 0:
 				if not moving:
 					if try_move(input_direction.x, input_direction.y):
-						reveal_tiles(minimap)
+						reveal_all_minimaps()
 						update_minimap_pos()
 						world.end_player_turn()
 					input_repeat_timer = input_repeat_rate
@@ -67,16 +67,22 @@ func _process(delta):
 func _unhandled_input(event):
 	if   event.is_action_pressed("turn_left"):
 		turn(1)
-		reveal_tiles(minimap)
+		reveal_all_minimaps()
 	elif event.is_action_pressed("turn_right"):
 		turn(-1)
-		reveal_tiles(minimap)
+		reveal_all_minimaps()
 	elif event.is_action_pressed("attack"):
 		attack()
 	elif event.is_action_pressed("examine"):
 		examine()
 	elif event.is_action_pressed("interact"):
 		interact()
+		
+func reveal_all_minimaps():
+	for mm in [minimap, GameState.menu_minimap]:
+		if mm:
+			reveal_tiles(mm)
+			GameState.menu_minimap.set_player_pos(Vector2i(grid_x, grid_y), facing)
 		
 func attack():
 	var rng = RandomNumberGenerator.new()

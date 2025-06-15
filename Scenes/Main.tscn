@@ -1,11 +1,16 @@
-[gd_scene load_steps=5 format=3 uid="uid://bx2nx6e61w0ws"]
+[gd_scene load_steps=9 format=3 uid="uid://bx2nx6e61w0ws"]
 
 [ext_resource type="PackedScene" uid="uid://ceudj14pim2r6" path="res://Scenes/UI Elements/3DWorld.tscn" id="1_r150o"]
+[ext_resource type="Script" uid="uid://d0xrr0e4dqrty" path="res://Scripts/main.gd" id="1_v1gob"]
 [ext_resource type="PackedScene" uid="uid://b7tjg7try5a3n" path="res://Scenes/Minimap.tscn" id="2_idj7w"]
 [ext_resource type="PackedScene" uid="uid://o2qlqyqag27k" path="res://Scenes/UI Elements/PauseMenu.tscn" id="3_kln2b"]
 [ext_resource type="PackedScene" uid="uid://d3pjmvoqvakwn" path="res://Scenes/UI Elements/DeathScreen.tscn" id="4_rgh2o"]
+[ext_resource type="PackedScene" uid="uid://c0251efsfkv36" path="res://Scenes/UI Elements/MenuScreen.tscn" id="5_pbw6q"]
+[ext_resource type="PackedScene" uid="uid://cgi45f5uepd87" path="res://Scenes/UI Elements/2DMinimap.tscn" id="7_jw32o"]
+[ext_resource type="PackedScene" uid="uid://ycupsrrqk1dc" path="res://Scenes/UI Elements/LoadingScreen.tscn" id="8_50glp"]
 
 [node name="Main" type="Node3D"]
+script = ExtResource("1_v1gob")
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
 anchors_preset = 15
@@ -34,6 +39,33 @@ scale = Vector2(0.5, 0.5)
 
 [node name="DeathScreen" parent="." instance=ExtResource("4_rgh2o")]
 
+[node name="LoadingScreen" parent="." instance=ExtResource("8_50glp")]
+
+[node name="MenuScreen" parent="." instance=ExtResource("5_pbw6q")]
+visible = false
+visibility_layer = 1
+
+[node name="TabContainer" parent="MenuScreen" index="1"]
+self_modulate = Color(1, 1, 1, 0.0627451)
+
+[node name="MenuMinimap" parent="MenuScreen/TabContainer/Map" index="0" instance=ExtResource("7_jw32o")]
+clip_children = 0
+custom_minimum_size = Vector2(900, 440)
+layout_mode = 1
+anchors_preset = 15
+anchor_left = 0.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = null
+
+[node name="Node2D" parent="MenuScreen/TabContainer/Map/MenuMinimap" index="0"]
+scale = Vector2(0.5, 0.5)
+
 [editable path="SubViewportContainer/SubViewport/3dWorld"]
 [editable path="UI"]
 [editable path="UI/2dMinimap"]
+[editable path="MenuScreen"]
+[editable path="MenuScreen/TabContainer/Map/MenuMinimap"]

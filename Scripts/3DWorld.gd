@@ -5,6 +5,8 @@ extends Node3D
 @export var minimap_path: NodePath
 @onready var tile_root   = $TileRoot
 @onready var entity_root = $EntityRoot
+@onready var loading_screen := $"../../../LoadingScreen"
+@onready var UI_root := $"../../../UI"
 
 # var map = MapGenerator.drunken_walk(2400)
 var map = MapGenerator.drunken_forest(2400)
@@ -15,6 +17,9 @@ var spawn_tiles = []
 var occupied_tiles: Dictionary = {}
 var player : Node3D
 var ui : Node = null
+var menu_screen: Control = null
+var minimap: TextureRect = null
+var ui_root: Node = null
 
 func load_dungeon_tiles():
 	tile_scenes = {
@@ -85,7 +90,7 @@ func spawn_player():
 	var camera = player.get_node("Camera3D")
 	$HoverDetector.set_camera(camera)
 	player.setup_light()
-	player.call_deferred("reveal_tiles", minimap)
+	player.call_deferred("reveal_all_minimaps")
 	
 func spawn_enemies(n):
 	var rng = RandomNumberGenerator.new()
@@ -130,6 +135,9 @@ func update_minimap_entities():
 			visible_positions.append(pos)
 	
 	minimap.set_entities(visible_positions)
+	
+	if GameState.menu_minimap:
+		GameState.menu_minimap.set_entities(visible_positions)
 			
 func generate_world(map_type: String, variant: String, steps: int, enemies: int) -> void:
 	var env_resource: Environment
@@ -165,9 +173,23 @@ func generate_world(map_type: String, variant: String, steps: int, enemies: int)
 	var minimap = get_node(minimap_path)
 	minimap.set_map_data(map)
 	minimap.set_player_pos(Vector2i(player.grid_x, player.grid_y), player.facing)
+	GameState.menu_minimap.set_map_data(map)
+	GameState.menu_minimap.set_player_pos(Vector2i(player.grid_x, player.grid_y), player.facing)
 	update_minimap_entities()
 	MessageBox.say("You venture forth into the unknown...")
 	
+func toggle_loading_screen(show: bool):
+	if loading_screen:
+		loading_screen.visible = show
+		if show:
+			loading_screen.move_to_front()
+			
+	UI_root.visible = not show
+	
 func _ready() -> void:
+	toggle_loading_screen(true)
+	await get_tree().process_frame
+	generate_world("forest", "moonlit", 2400, 10)
+	toggle_loading_screen(false)
 	MessageBox.show()
-	generate_world("forest", "moonlit", 2400, 10) # TODO: Take two inputs, map_type and steps
+	

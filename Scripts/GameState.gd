@@ -2,6 +2,10 @@ extends Node
 
 enum CursorMode { DEFAULT, LOOK, ATTACK, INTERACT, MOVE}
 var current_mode: CursorMode = CursorMode.DEFAULT
+var menu_screen: Control = null
+var minimap: TextureRect = null          # HUD minimap
+var menu_minimap: TextureRect = null     # Menu fullscreen minimap
+var ui_root: CanvasLayer = null
 
 func _ready():
 	Input.set_custom_mouse_cursor(preload("res://Assets/Cursors/cursor_gauntlet.png"))
@@ -15,6 +19,29 @@ func _unhandled_input(event):
 		set_cursor_mode(CursorMode.INTERACT)
 	elif event.is_action_pressed("cursor_mode_move"):
 		set_cursor_mode(CursorMode.MOVE)
+	elif event.is_action_pressed("menu"):
+		toggle_menu()
+		
+func toggle_menu():
+	if not menu_screen or not minimap or not menu_minimap:
+		push_warning("Missing UI references in GameState")
+		return
+
+	var is_open = not menu_screen.visible
+	menu_screen.visible = is_open
+
+	# Toggle visibility between minimaps
+	minimap.visible = not is_open
+	menu_minimap.visible = is_open
+	
+	# MessageBox.visible = not is_open
+
+	if is_open:
+		menu_minimap.set_zoom(1.5)  # Bigger map view
+		menu_minimap.set_player_pos(minimap.player_grid_pos, minimap.player_facing)
+		menu_minimap.set_entities(minimap.entity_positions)
+		menu_minimap.draw_minimap()
+		
 		
 func set_cursor_mode(mode):
 	current_mode = mode
