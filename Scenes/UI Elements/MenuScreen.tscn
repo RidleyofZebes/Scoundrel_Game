@@ -49,12 +49,12 @@ tabs_visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="Inventory" type="Control" parent="TabContainer"]
+[node name="InventoryTab" type="Control" parent="TabContainer"]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 
-[node name="Settings" type="Control" parent="TabContainer"]
+[node name="SettingsTab" type="Control" parent="TabContainer"]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 2

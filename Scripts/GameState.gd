@@ -37,7 +37,6 @@ func toggle_menu():
 	# MessageBox.visible = not is_open
 
 	if is_open:
-		menu_minimap.set_zoom(1.5)  # Bigger map view
 		menu_minimap.set_player_pos(minimap.player_grid_pos, minimap.player_facing)
 		menu_minimap.set_entities(minimap.entity_positions)
 		menu_minimap.draw_minimap()

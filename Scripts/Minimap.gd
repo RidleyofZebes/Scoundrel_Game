@@ -83,7 +83,7 @@ func draw_minimap():
 		tile_sprites[pos].modulate = draw_color
 			
 func center_minimap_on_player():
-#	var minimap_size = Vector2(512, 512)
+	#var minimap_size = Vector2(512, 512)
 	var minimap_size = size * 2
 	
 	var center_pixel = minimap_size / 2

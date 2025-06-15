@@ -42,6 +42,7 @@ scale = Vector2(0.5, 0.5)
 [node name="DeathScreen" parent="." instance=ExtResource("4_rgh2o")]
 
 [node name="LoadingScreen" parent="." instance=ExtResource("8_50glp")]
+visible = true
 
 [node name="MenuScreen" parent="." instance=ExtResource("5_pbw6q")]
 visible = false
@@ -49,10 +50,19 @@ visibility_layer = 1
 
 [node name="TabContainer" parent="MenuScreen" index="1"]
 self_modulate = Color(1, 1, 1, 0.0627451)
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 138.0
+offset_top = 100.0
+offset_right = -114.0
+offset_bottom = -108.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="MenuMinimap" parent="MenuScreen/TabContainer/Map" index="0" instance=ExtResource("7_jw32o")]
-clip_children = 0
-custom_minimum_size = Vector2(900, 440)
 layout_mode = 1
 anchors_preset = 15
 anchor_left = 0.0
@@ -62,6 +72,7 @@ offset_bottom = 0.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = null
+stretch_mode = 2
 
 [node name="Node2D" parent="MenuScreen/TabContainer/Map/MenuMinimap" index="0"]
 scale = Vector2(0.5, 0.5)

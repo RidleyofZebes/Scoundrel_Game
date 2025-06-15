@@ -5,5 +5,5 @@ extends Node3D
 func _ready() -> void:
 	GameState.menu_screen = $MenuScreen
 	GameState.minimap = $"UI/2dMinimap"
-	GameState.menu_minimap = $MenuScreen/TabContainer/Map/MenuMinimap
+	GameState.menu_minimap = $MenuScreen/TabContainer/Map/MenuMinimap 
 	GameState.ui_root = $UI
