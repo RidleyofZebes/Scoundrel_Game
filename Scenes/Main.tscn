@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bx2nx6e61w0ws"]
+[gd_scene load_steps=11 format=3 uid="uid://bx2nx6e61w0ws"]
 
 [ext_resource type="PackedScene" uid="uid://ceudj14pim2r6" path="res://Scenes/UI Elements/3DWorld.tscn" id="1_r150o"]
 [ext_resource type="Script" uid="uid://d0xrr0e4dqrty" path="res://Scripts/main.gd" id="1_v1gob"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://c0251efsfkv36" path="res://Scenes/UI Elements/MenuScreen.tscn" id="5_pbw6q"]
 [ext_resource type="PackedScene" uid="uid://cgi45f5uepd87" path="res://Scenes/UI Elements/2DMinimap.tscn" id="7_jw32o"]
 [ext_resource type="PackedScene" uid="uid://ycupsrrqk1dc" path="res://Scenes/UI Elements/LoadingScreen.tscn" id="8_50glp"]
+[ext_resource type="PackedScene" uid="uid://dmjjyymj5t62w" path="res://Scenes/UI Elements/InventoryUI.tscn" id="10_bmxlf"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_v1gob")
@@ -77,8 +78,33 @@ stretch_mode = 2
 [node name="Node2D" parent="MenuScreen/TabContainer/Map/MenuMinimap" index="0"]
 scale = Vector2(0.5, 0.5)
 
+[node name="InventoryUi" parent="MenuScreen/TabContainer/InventoryTab" index="0" instance=ExtResource("10_bmxlf")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VSplitContainer" parent="MenuScreen/TabContainer/InventoryTab/InventoryUi" index="0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PlayerSection" parent="MenuScreen/TabContainer/InventoryTab/InventoryUi/VSplitContainer" index="0"]
+custom_minimum_size = Vector2(450, 0)
+
+[node name="ContainerSection" parent="MenuScreen/TabContainer/InventoryTab/InventoryUi/VSplitContainer" index="1"]
+custom_minimum_size = Vector2(450, 0)
+
 [editable path="SubViewportContainer/SubViewport/3dWorld"]
 [editable path="UI"]
 [editable path="UI/2dMinimap"]
 [editable path="MenuScreen"]
 [editable path="MenuScreen/TabContainer/Map/MenuMinimap"]
+[editable path="MenuScreen/TabContainer/InventoryTab/InventoryUi"]

@@ -22,7 +22,7 @@ func return_to_title():
 	get_tree().change_scene_to_file("res://Scenes/UI Elements/TitleScreen.tscn")
 	
 func _unhandled_input(event):
-	if event.is_action_pressed("pause"):
+	if event.is_action_pressed("ui_cancel") and GameState.menu_type == GameState.MenuType.NONE:
 		print("pause pressed")
 		if visible:
 			resume()

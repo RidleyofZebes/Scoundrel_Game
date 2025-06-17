@@ -1,5 +1,36 @@
-[gd_scene format=3 uid="uid://dmjjyymj5t62w"]
+[gd_scene load_steps=2 format=3 uid="uid://dmjjyymj5t62w"]
+
+[ext_resource type="Script" uid="uid://b8pxadk7ouh3o" path="res://Scripts/inventory_ui.gd" id="1_u7v26"]
 
 [node name="InventoryUi" type="Control"]
 layout_mode = 3
 anchors_preset = 0
+script = ExtResource("1_u7v26")
+
+[node name="VSplitContainer" type="HSplitContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="PlayerSection" type="VBoxContainer" parent="VSplitContainer"]
+layout_mode = 2
+
+[node name="PlayerAvatar" type="TextureRect" parent="VSplitContainer/PlayerSection"]
+layout_mode = 2
+
+[node name="PlayerInventory" type="GridContainer" parent="VSplitContainer/PlayerSection"]
+layout_mode = 2
+
+[node name="ContainerSection" type="VBoxContainer" parent="VSplitContainer"]
+layout_mode = 2
+
+[node name="ContainerAvatar" type="TextureRect" parent="VSplitContainer/ContainerSection"]
+layout_mode = 2
+
+[node name="ContainerInventory" type="GridContainer" parent="VSplitContainer/ContainerSection"]
+layout_mode = 2
+
+[node name="CoinPurse" type="Label" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0

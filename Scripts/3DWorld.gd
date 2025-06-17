@@ -88,6 +88,7 @@ func spawn_player():
 	player.minimap = minimap
 	player.world = self
 	entity_root.add_child(player)
+	GameState.player = player
 	var camera = player.get_node("Camera3D")
 	$HoverDetector.set_camera(camera)
 	player.setup_light()

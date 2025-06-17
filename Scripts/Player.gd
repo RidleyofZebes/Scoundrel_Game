@@ -15,6 +15,7 @@ var input_repeat_timer := 0.0
 var input_repeat_delay := 0.4
 var input_repeat_rate := 0.1
 var display_name: String = "You"
+var inventory := Inventory.new()
 
 var stats := {
 	"Luck": 5,
@@ -28,7 +29,9 @@ var stats := {
 func get_stat(stat_name: String) -> int:
 	return stats.get(stat_name, 0)
 
-func _process(delta):		
+func _process(delta):
+	if GameState.menu_type != GameState.MenuType.NONE:
+		return
 	var dir = Vector2i.ZERO
 	
 	if   Input.is_action_pressed("move_forward"):
@@ -65,6 +68,8 @@ func _process(delta):
 		input_repeat_timer = 0
 		
 func _unhandled_input(event):
+	if GameState.menu_type != GameState.MenuType.NONE:
+		return
 	if   event.is_action_pressed("turn_left"):
 		turn(1)
 		reveal_all_minimaps()
@@ -138,7 +143,15 @@ func examine():
 	MessageBox.say("There's nothing there, except for... No, no, there's nothing.")
 	
 func interact():
-	pass
+	var dir = direction_vectors[facing]
+	var target_pos = Vector2i(grid_x + dir.x, grid_y + dir.y)
+	
+	for entity in get_tree().get_nodes_in_group("entities"):
+		if entity.grid_x == target_pos.x and entity.grid_y == target_pos.y:
+			if entity.has_method("interact"):
+				entity.interact()
+			return
+	MessageBox.say("You see nothing of interest.")
 	
 func get_line(x0: int, y0: int, x1: int, y1: int) -> Array:
 	var line = []

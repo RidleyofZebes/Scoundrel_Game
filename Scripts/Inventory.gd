@@ -5,6 +5,7 @@ class_name Inventory
 
 var slots: int = 10
 var items: Array = []
+var coinpurse: int = 0
 
 func set_capacity(size: int) -> void:
 	slots = size
@@ -42,3 +43,9 @@ func has_item(id: String) -> bool:
 		if item.id == id:
 			return true
 	return false
+
+func add_coins(amount: int):
+	coinpurse += amount
+	
+func get_coins() -> int:
+	return coinpurse

@@ -1,0 +1,29 @@
+[gd_scene load_steps=2 format=3 uid="uid://c7v1tt5pbik6h"]
+
+[ext_resource type="Script" uid="uid://dbtvhm28jgyo4" path="res://Scripts/inventory_slot.gd" id="1_vn0pf"]
+
+[node name="InventorySlot" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_vn0pf")
+
+[node name="Icon" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch_mode = 5
+
+[node name="CountLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -23.0
+grow_horizontal = 0
+grow_vertical = 0
