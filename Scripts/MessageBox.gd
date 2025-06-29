@@ -4,15 +4,27 @@ extends CanvasLayer
 const MAX_LOG_LINES := 7
 const TYPING_SPEED := 0.01 # TODO: Add to options menu
 
+var _message_queue: Array[String] = []
+var _is_typing: bool = false
+
 func say(message: String) -> void:
+	_message_queue.append(message)
+	if not _is_typing:
+		_process_queue()
+	
+func _process_queue() -> void:
+	if _message_queue.size() == 0:
+		_is_typing = false
+		return
+	_is_typing = true
+	var message = _message_queue.pop_front()
 	var label = Label.new()
 	label.text = ""
 	label.modulate = Color.WHITE
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	log_list.add_child(label)
 	log_list.move_child(label, 0)
-	
-	typing_message(label, message)
+	await typing_message(label, message)
 	
 	for i in log_list.get_child_count():
 		var child = log_list.get_child(i)
@@ -20,6 +32,7 @@ func say(message: String) -> void:
 		child.modulate.a = fade
 		
 	call_deferred("_cleanup_log_lines")
+	_process_queue()
 	
 func typing_message(label: Label, message: String) -> void:
 	await get_tree().process_frame

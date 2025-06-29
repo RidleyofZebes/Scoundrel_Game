@@ -4,21 +4,37 @@
 
 [node name="InventoryUi" type="Control"]
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_u7v26")
 
 [node name="VSplitContainer" type="HSplitContainer" parent="."]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="PlayerSection" type="VBoxContainer" parent="VSplitContainer"]
 layout_mode = 2
 
-[node name="PlayerAvatar" type="TextureRect" parent="VSplitContainer/PlayerSection"]
+[node name="PlayerPaperdoll" type="TextureRect" parent="VSplitContainer/PlayerSection"]
 layout_mode = 2
 
-[node name="PlayerInventory" type="GridContainer" parent="VSplitContainer/PlayerSection"]
+[node name="PlayerEquipment" type="GridContainer" parent="VSplitContainer/PlayerSection"]
+layout_mode = 2
+
+[node name="CoinPurse" type="Label" parent="VSplitContainer/PlayerSection"]
+layout_mode = 2
+
+[node name="InventorySection" type="VBoxContainer" parent="VSplitContainer"]
+layout_mode = 2
+
+[node name="PlayerInventory" type="GridContainer" parent="VSplitContainer/InventorySection"]
 layout_mode = 2
 
 [node name="ContainerSection" type="VBoxContainer" parent="VSplitContainer"]
@@ -29,8 +45,3 @@ layout_mode = 2
 
 [node name="ContainerInventory" type="GridContainer" parent="VSplitContainer/ContainerSection"]
 layout_mode = 2
-
-[node name="CoinPurse" type="Label" parent="."]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0

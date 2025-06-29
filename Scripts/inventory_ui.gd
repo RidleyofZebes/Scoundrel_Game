@@ -1,9 +1,9 @@
 extends Control
 
 
-@onready var player_grid = $VSplitContainer/PlayerSection/PlayerInventory
-@onready var player_avatar = $VSplitContainer/PlayerSection/PlayerAvatar
-@onready var coin_label = $CoinPurse
+@onready var player_grid = $VSplitContainer/PlayerSection/PlayerEquipment
+@onready var player_avatar = $VSplitContainer/PlayerSection/PlayerPaperdoll
+@onready var coin_label = $VSplitContainer/PlayerSection/CoinPurse
 @onready var container_grid = $VSplitContainer/ContainerSection/ContainerInventory
 @onready var container_avatar = $VSplitContainer/ContainerSection/ContainerAvatar
 
