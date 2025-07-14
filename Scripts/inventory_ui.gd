@@ -28,7 +28,7 @@ func close():
 	hide()
 	
 func refresh():
-	var coins = player_inv.has("coinpurse") if player_inv.get("coinpurse") else 0
+	var coins = player_inv.get_coins()
 	coin_label.text = "Gold: %d" % coins
 	
 	_populate_grid(player_grid, player_inv)
@@ -41,7 +41,13 @@ func refresh():
 func _populate_grid(grid: GridContainer, inv: Inventory):
 	for child in grid.get_children():
 		child.queue_free()
-	for item in inv.get_items():
+	var item_list = inv.get_items()
+	var slot_count = inv.slots
+	
+	for i in range(slot_count):
 		var slot = slot_scene.instantiate()
-		slot.set_item(item.id, item.count)
 		grid.add_child(slot)
+		if i < item_list.size():
+			slot.set_item(item_list[i]["id"], item_list[i]["count"])
+		else:
+			slot.set_empty()

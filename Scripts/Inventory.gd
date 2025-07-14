@@ -14,7 +14,7 @@ func add_item(id: String, amount: int = 1) -> bool:
 	if items.size() >= slots:
 		return false
 	
-	var existing := 1
+	var existing := -1
 	for i in range(items.size()):
 		if items[i].id == id:
 			existing = i

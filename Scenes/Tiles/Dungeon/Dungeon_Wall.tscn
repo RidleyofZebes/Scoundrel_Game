@@ -65,6 +65,6 @@ mesh = SubResource("ArrayMesh_vorx7")
 surface_material_override/0 = ExtResource("2_4vtdw")
 
 [node name="blockbench_export2" parent="." instance=ExtResource("3_ppy0x")]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, -0.5, 0)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 
 [editable path="blockbench_export2"]

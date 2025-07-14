@@ -106,3 +106,48 @@ func drunken_forest(step_target: int) -> Array:
 						break
 
 	return padded_map
+
+
+func simple_maze(width: int, height: int) -> Array:
+	if width % 2 == 0:
+		width += 1
+	if height % 2 == 0:
+		height += 1
+		
+	var maze = []
+	for y in range(height):
+		maze.append([])
+		for x in range(width):
+			maze[y].append(0)
+
+	var directions = [Vector2i(0, -2), Vector2i(0, 2), Vector2i(2, 0), Vector2i(-2, 0)]
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+
+	_carve_maze_iterative(maze, directions, width, height, Vector2i(1, 1), rng)
+	print(maze)
+	return maze
+
+func _carve_maze_iterative(maze: Array, directions: Array, width: int, height: int, start_pos: Vector2i, rng: RandomNumberGenerator) -> void:
+	var stack = [start_pos]
+	maze[start_pos.y][start_pos.x] = 1
+
+	while stack.size() > 0:
+		var current = stack.back()
+		var neighbors = []
+
+		for dir in directions:
+			var next_pos = current + dir
+			if next_pos.x > 0 and next_pos.x < width - 1 and next_pos.y > 0 and next_pos.y < height - 1:
+				if maze[next_pos.y][next_pos.x] == 0:
+					neighbors.append(dir)
+
+		if neighbors.size() > 0:
+			var chosen_dir = neighbors[rng.randi_range(0, neighbors.size() - 1)]
+			var between = current + chosen_dir / 2
+			var next_pos = current + chosen_dir
+			maze[between.y][between.x] = 1
+			maze[next_pos.y][next_pos.x] = 1
+			stack.append(next_pos)
+		else:
+			stack.pop_back()

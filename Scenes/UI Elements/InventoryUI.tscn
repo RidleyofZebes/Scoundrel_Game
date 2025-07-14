@@ -27,6 +27,7 @@ layout_mode = 2
 
 [node name="PlayerEquipment" type="GridContainer" parent="VSplitContainer/PlayerSection"]
 layout_mode = 2
+columns = 5
 
 [node name="CoinPurse" type="Label" parent="VSplitContainer/PlayerSection"]
 layout_mode = 2
@@ -36,6 +37,7 @@ layout_mode = 2
 
 [node name="PlayerInventory" type="GridContainer" parent="VSplitContainer/InventorySection"]
 layout_mode = 2
+columns = 5
 
 [node name="ContainerSection" type="VBoxContainer" parent="VSplitContainer"]
 layout_mode = 2
@@ -45,3 +47,4 @@ layout_mode = 2
 
 [node name="ContainerInventory" type="GridContainer" parent="VSplitContainer/ContainerSection"]
 layout_mode = 2
+columns = 5

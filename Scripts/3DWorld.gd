@@ -10,7 +10,8 @@ extends Node3D
 @onready var UI_root := $"../../../UI"
 
 # var map = MapGenerator.drunken_walk(2400)
-var map = MapGenerator.drunken_forest(2400)
+# var map = MapGenerator.drunken_forest(2400)
+var map
 # var map = MapGenerator.void_platform(32) # debug room
 
 var tile_scenes: Dictionary = {}
@@ -169,7 +170,7 @@ func generate_world(map_type: String, variant: String, steps: int, enemies: int)
 					push_warning("Unknown environment, using default!")
 					return
 			load_dungeon_tiles()
-			map = MapGenerator.drunken_walk(steps)
+			map = MapGenerator.simple_maze(steps, steps)
 		"forest":
 			match variant:
 				"sunny":
@@ -209,7 +210,7 @@ func toggle_loading_screen(show: bool):
 func _ready() -> void:
 	toggle_loading_screen(true)
 	await get_tree().process_frame
-	generate_world("forest", "moonlit", 2400, 10)
+	generate_world("dungeon", "pitchblack", 100, 10)
 	toggle_loading_screen(false)
 	MessageBox.show()
 	
