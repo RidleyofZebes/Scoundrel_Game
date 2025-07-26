@@ -113,41 +113,57 @@ func simple_maze(width: int, height: int) -> Array:
 		width += 1
 	if height % 2 == 0:
 		height += 1
-		
+
 	var maze = []
 	for y in range(height):
 		maze.append([])
 		for x in range(width):
 			maze[y].append(0)
 
-	var directions = [Vector2i(0, -2), Vector2i(0, 2), Vector2i(2, 0), Vector2i(-2, 0)]
+	var directions = [Vector2i(0,-2), Vector2i(0,2), Vector2i(2,0), Vector2i(-2,0)]
 	var rng = RandomNumberGenerator.new()
 	rng.randomize()
 
-	_carve_maze_iterative(maze, directions, width, height, Vector2i(1, 1), rng)
-	print(maze)
-	return maze
-
-func _carve_maze_iterative(maze: Array, directions: Array, width: int, height: int, start_pos: Vector2i, rng: RandomNumberGenerator) -> void:
-	var stack = [start_pos]
-	maze[start_pos.y][start_pos.x] = 1
+	var stack = [Vector2i(1,1)]
+	maze[1][1] = 1
 
 	while stack.size() > 0:
-		var current = stack.back()
-		var neighbors = []
+		var pos = stack.back()
+		directions.shuffle()
+		var carved = false
 
 		for dir in directions:
-			var next_pos = current + dir
-			if next_pos.x > 0 and next_pos.x < width - 1 and next_pos.y > 0 and next_pos.y < height - 1:
-				if maze[next_pos.y][next_pos.x] == 0:
-					neighbors.append(dir)
+			var next_pos = pos + dir
+			if next_pos.x > 0 and next_pos.x < width - 1 and next_pos.y > 0 and next_pos.y < height - 1 and maze[next_pos.y][next_pos.x] == 0:
+				maze[pos.y + dir.y / 2][pos.x + dir.x / 2] = 1
+				maze[next_pos.y][next_pos.x] = 1
+				stack.append(next_pos)
+				carved = true
+				break
 
-		if neighbors.size() > 0:
-			var chosen_dir = neighbors[rng.randi_range(0, neighbors.size() - 1)]
-			var between = current + chosen_dir / 2
-			var next_pos = current + chosen_dir
-			maze[between.y][between.x] = 1
-			maze[next_pos.y][next_pos.x] = 1
-			stack.append(next_pos)
-		else:
+		if not carved:
 			stack.pop_back()
+
+	return maze
+
+func roomy_maze(width: int, height: int, room_attempts: int = 10, room_min: int = 3, room_max: int = 7) -> Array:
+	var maze = simple_maze(width, height)
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+
+	for i in range(room_attempts):
+		var room_w = rng.randi_range(room_min, room_max)
+		var room_h = rng.randi_range(room_min, room_max)
+		var room_x = rng.randi_range(1, width - room_w - 2)
+		var room_y = rng.randi_range(1, height - room_h - 2)
+
+		if room_x % 2 == 0:
+			room_x += 1
+		if room_y % 2 == 0:
+			room_y += 1
+
+		for y in range(room_y, room_y + room_h):
+			for x in range(room_x, room_x + room_w):
+				maze[y][x] = 1
+
+	return maze

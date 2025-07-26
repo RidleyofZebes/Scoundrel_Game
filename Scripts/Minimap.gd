@@ -17,12 +17,16 @@ var entity_positions = []
 var base_tile_size = 32
 var tile_size = 32
 var current_zoom := 1.0
+var is_panning := false
+var pan_last_mouse_pos := Vector2.ZERO
+var pan_start_layer_pos := Vector2.ZERO
+var pan_enabled := false
 
 func set_map_data(data):
 	map_data = data
 	
 func set_zoom(factor: float):
-	current_zoom = clamp(factor, 0.25, 2.0)
+	current_zoom = clamp(factor, 0.25, 1.5)
 	tile_size = base_tile_size * current_zoom
 	
 	for pos in tile_sprites.keys():
@@ -122,10 +126,39 @@ func update_entities():
 		entities_layer.add_child(icon)
 		
 func _gui_input(event):
-	if event is InputEventMouseButton and event.pressed:
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if not pan_enabled:
+				return
+			if event.double_click:
+				center_minimap_on_player()
+				is_panning = false
+				accept_event()
+			if event.pressed:
+				is_panning = true
+				pan_last_mouse_pos = event.position
+				pan_start_layer_pos = tilemap_layer.position
+				accept_event()
+			else:
+				is_panning = false
+				accept_event()
+		elif event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
 			set_zoom(current_zoom + 0.25)
 			accept_event()  # Prevents event from propagating to world
-		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
 			set_zoom(current_zoom - 0.25)
 			accept_event()
+	elif event is InputEventMouseMotion and is_panning:
+		var delta = event.position - pan_last_mouse_pos
+		var new_pos = pan_start_layer_pos + delta
+		tilemap_layer.position = new_pos
+		entities_layer.position = new_pos
+		accept_event()
+	
+func reveal_all_tiles():
+	if map_data.is_empty():
+		return
+	for y in range(map_data.size()):
+		for x in range(map_data[y].size()):
+			discovered_tiles[Vector2i(x, y)] = true
+	draw_minimap()

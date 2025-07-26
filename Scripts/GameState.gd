@@ -14,12 +14,31 @@ var player: Player = null
 var inventory_ui: Control = null
 var menu_tabs: TabContainer = null
 var open_container_node: Node = null
+var world: Node = null
+
+var konami_sequence := [
+	KEY_UP, KEY_UP, KEY_DOWN, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_LEFT, KEY_RIGHT, KEY_B, KEY_A, KEY_TAB, KEY_ENTER
+]
+var konami_progress := 0
+var cheats_enabled := true # TODO Change back to false when done with testing
 
 func _ready():
 	Input.set_custom_mouse_cursor(preload("res://Assets/Cursors/cursor_gauntlet.png"))
 	inventory_ui = get_node("MenuScreen/TabContainer/InventoryTab/InventoryUi")
 
 func _unhandled_input(event):
+	if not cheats_enabled and event is InputEventKey and event.pressed:
+		if event.keycode == konami_sequence[konami_progress]:
+			konami_progress += 1
+			if konami_progress == konami_sequence.size():
+				cheats_enabled = true
+				print("#### CHEATS ENABLED ####")
+				MessageBox.say("You feel a shift in the fabric of reality...!")
+				konami_progress = 0
+		else:
+			if event.keycode != konami_sequence[0] or konami_progress == 0:
+				konami_progress = 0
+	
 	if event.is_action_pressed("cursor_mode_look"):
 		set_cursor_mode(CursorMode.LOOK)
 	elif event.is_action_pressed("cursor_mode_attack"):
@@ -37,6 +56,29 @@ func _unhandled_input(event):
 		if menu_type != MenuType.NONE:
 			close_all_menus()
 			return
+	
+	if cheats_enabled and event is InputEventKey and event.pressed:
+		match event.keycode:
+			KEY_F1:
+				_debug_reveal_map()
+			KEY_F2:
+				_debug_reveal_entities()
+				
+func _debug_reveal_map():
+	print("#### Map Revealed ####")
+	MessageBox.say("The secrets of the realm are revealed to you...!")
+	if minimap:
+		minimap.reveal_all_tiles()
+	if menu_minimap:
+		menu_minimap.reveal_all_tiles()
+		
+func _debug_reveal_entities():
+	print("#### Entities Revealed ####")
+	MessageBox.say("Your senses expand to see beyond your limits...!")
+	if minimap:
+		world.reveal_all_entities()
+	if menu_minimap:
+		world.reveal_all_entities()
 		
 func close_all_menus():
 	if open_container_node:

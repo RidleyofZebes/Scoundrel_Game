@@ -22,13 +22,19 @@ var ui : Node = null
 var menu_screen: Control = null
 var minimap: TextureRect = null
 var ui_root: Node = null
+var exit_tile: Vector2i = Vector2i(-1, -1)
+var entrance_tile: Vector2i = Vector2i(-1, -1)
+var player_spawn: Vector2i = Vector2i(-1, -1)
+var entrance_dir
 
 func load_dungeon_tiles():
 	tile_scenes = {
 		0: preload("res://Scenes/Tiles/Dungeon/Dungeon_Wall.tscn"),
 		1: preload("res://Scenes/Tiles/Dungeon/Dungeon_Floor.tscn"),
-#		2: preload(),
-#		3: preload(),
+#		2: preload(), # Void
+		3: preload("res://Scenes/Tiles/Dungeon/Dungeon_Door.tscn"),
+		4: preload("res://Scenes/Tiles/Dungeon/Dungeon_Entrance.tscn"),
+		5: preload("res://Scenes/Tiles/Dungeon/Dungeon_Exit.tscn"),
 	}
 	GlobalTileData.load_tiles("res://Data/Dungeon_Tiles.json")
 
@@ -44,7 +50,6 @@ func load_forest_tiles():
 func generate_map():
 	spawn_tiles.clear()
 	GlobalTileData.load_tiles()
-	var tile_pos
 	for y in range(map.size()):
 		for x in range(map[0].size()):
 			var tile_id = map[y][x]
@@ -53,38 +58,46 @@ func generate_map():
 				var tile: TileBase = scene.instantiate()
 				tile.position = Vector3(x, -0.5, y)
 				tile.tile_id = tile_id
+				tile_root.add_child(tile)
+				
 				if tile_id == 2:  # Tree cluster tile
 					var rng = RandomNumberGenerator.new()
 					rng.randomize()
 					var rotations = [0, 90, 180, 270]
 					var random_angle = rotations[rng.randi_range(0, 3)]
 					tile.rotation_degrees.y = random_angle
-				tile_root.add_child(tile)
+				
 				if tile_id == 1:
 					spawn_tiles.append(Vector2i(x, y))
+				#elif tile_id == 4:
+					#entrance_tile = Vector2i(x, y)
+				#elif tile_id == 5:
+					#exit_tile = Vector2i(x, y)
+					
+	if spawn_tiles.has(entrance_tile):
+		spawn_tiles.erase(entrance_tile)
+	if spawn_tiles.has(exit_tile):
+		spawn_tiles.erase(exit_tile)
+					
 	print("Generated ", spawn_tiles.size(), " floor tiles.")
 
 func spawn_player():
 	player = player_entity.instantiate()
 	
-	var random = RandomNumberGenerator.new()
-	random.randomize()
-
-	if spawn_tiles.is_empty():
-		push_error("No spawn tiles available! Check generate_map() logic.")
-		return	
-
-	var player_spawn = spawn_tiles[random.randi_range(0, spawn_tiles.size() -1)]
-	occupied_tiles[player_spawn] = player
-	player.grid_x = player_spawn[0]
-	player.grid_y = player_spawn[1]
-	player.facing = random.randi_range(0, 3)
+	if entrance_tile == Vector2i(-1, -1) or player_spawn == Vector2i(-1, -1):
+		push_error("No entrance or spawn tile set! Check your generation logic, dumbass.")
+		return
+	
+	occupied_tiles[entrance_tile] = player
+	player.grid_x = player_spawn.x
+	player.grid_y = player_spawn.y
+	player.facing = 2
 	player.target_rotation_y = player.facing * 90
 	player.rotation_degrees.y = player.target_rotation_y
 	player.map = map
 	player.vision_mode = 2
 	player.ui = ui
-	player.position = Vector3(player_spawn[0], 0, player_spawn[1])
+	player.position = Vector3(entrance_tile[0], 0, entrance_tile[1])
 	var minimap = get_node(minimap_path)
 	player.minimap = minimap
 	player.world = self
@@ -170,7 +183,12 @@ func generate_world(map_type: String, variant: String, steps: int, enemies: int)
 					push_warning("Unknown environment, using default!")
 					return
 			load_dungeon_tiles()
-			map = MapGenerator.simple_maze(steps, steps)
+			var dungeon_result = DungeonGenerator.generate(steps, steps)
+			map = dungeon_result["map"]
+			player_spawn = dungeon_result["player_spawn"]
+			entrance_tile = dungeon_result["entrance_tile"]
+			entrance_dir = dungeon_result["entrance_dir"]
+			exit_tile = dungeon_result["exit_tile"]
 		"forest":
 			match variant:
 				"sunny":
@@ -208,9 +226,20 @@ func toggle_loading_screen(show: bool):
 	UI_root.visible = not show
 	
 func _ready() -> void:
+	GameState.world = self
 	toggle_loading_screen(true)
 	await get_tree().process_frame
-	generate_world("dungeon", "pitchblack", 100, 10)
+	generate_world("dungeon", "pitchblack", 50, 10)
 	toggle_loading_screen(false)
 	MessageBox.show()
 	
+func reveal_all_entities():
+	var all_entity_positions := []
+	for e in get_tree().get_nodes_in_group("enemies"):
+		if is_instance_valid(e) and e.get_parent() != null:
+			all_entity_positions.append(Vector2i(e.grid_x, e.grid_y))
+	var minimap = get_node_or_null(minimap_path)
+	if minimap:
+		minimap.set_entities(all_entity_positions)
+	if GameState.menu_minimap:
+		GameState.menu_minimap.set_entities(all_entity_positions)

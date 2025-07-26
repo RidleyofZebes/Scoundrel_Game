@@ -23,6 +23,7 @@ GlobalTileData="*res://Scripts/TileData.gd"
 MessageBox="*res://Scenes/UI Elements/MessageBox.tscn"
 GlobalEnemyData="*res://Scripts/EnemyData.gd"
 ItemDB="*res://Scripts/ItemDatabase.gd"
+DungeonGenerator="*res://Scripts/DungeonGenerator.gd"
 
 [editor]
 
