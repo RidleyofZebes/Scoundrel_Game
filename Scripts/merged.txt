@@ -109,6 +109,8 @@ func generate_map():
 				if tile_id == 3: # doors
 					var rot = get_door_rotation(x, y)
 					tile.rotation_degrees.y = rot
+					tile.grid_x = x
+					tile.grid_y = y
 					
 				if tile_id == 4: # entrance
 					entrance_tile = Vector2i(x, y)
@@ -375,6 +377,74 @@ func return_to_title():
 	get_tree().change_scene_to_file("res://Scenes/UI Elements/TitleScreen.tscn")
 
 
+##Door.gd
+extends TileBase
+
+@onready var animation_player := $blockbench_export/AnimationPlayer
+
+var is_open = false
+var grid_x: int = 0
+var grid_y: int = 0
+var map = GameState.world.map
+var display_name = "d00r"
+var last_open_anim: String = ""
+
+func _ready() -> void:
+	add_to_group("entities")
+	var anim = ""
+	if is_open:
+		anim = "Open_Out"
+		last_open_anim = "anim"
+	else:
+		anim = "Close_Out"
+	if animation_player.has_animation(anim):
+		animation_player.play(anim)
+		if is_open:
+			animation_player.seek(animation_player.current_animation_length, true)
+		else:
+			animation_player.seek(0, true)
+	
+func interact(interact_origin: Vector2i):
+	var delta = interact_origin - Vector2i(grid_x, grid_y)
+	var anim = ""
+
+	var horizontal = abs(delta.x) > abs(delta.y)
+	if is_open:
+		if last_open_anim == "Open_In":
+			anim = "Close_In"
+		else:
+			anim = "Close_Out"
+	else:
+		if horizontal:
+			if delta.x < 0:
+				anim = "Open_Out"
+			else:
+				anim = "Open_In"
+		else:
+			if delta.y < 0:
+				anim = "Open_Out"
+			else:
+				anim = "Open_In"
+		last_open_anim = anim 
+
+	is_open = !is_open
+	update_tile_state(anim)
+	
+func update_tile_state(anim_name: String):
+	if is_open:
+		map[grid_y][grid_x] = 6
+	else:
+		map[grid_y][grid_x] = 3
+	if animation_player.has_animation(anim_name):
+		animation_player.play(anim_name)
+		print("Playing ", anim_name)
+		await animation_player.animation_finished
+	
+	var player = GameState.player
+	if player:
+		player.reveal_tiles(player.minimap)
+
+
 ##Enemy.gd
 extends "res://Scripts/EntityBase.gd"
 
@@ -484,10 +554,11 @@ extends Node3D
 
 #@onready var tween = $MoveTween
 
-enum VisionMode { BLIND, DARKVISION, TORCH, LANTERN, BULLSEYE}
+enum VisionMode { BLIND, DARKVISION, TORCH, LANTERN, BULLSEYE }
 
 var world: Node = null
 var player: Node3D = null
+var entity_type := 0
 var ui: Node = null
 var grid_x: int
 var grid_y: int
@@ -515,20 +586,26 @@ func _ready():
 func try_move(dx: int, dy: int) -> bool:
 	if moving:
 		return false
-	
+		
 	var new_x = grid_x + dx
 	var new_y = grid_y + dy
 	var target_pos = Vector2i(new_x, new_y)
+	
 	if new_y < 0 or new_y >= map.size() or new_x < 0 or new_x >= map[0].size():
 		print("can't move to ", new_x, " ", new_y, ", out of bounds!")
 		return false
-	if map[new_y][new_x] != 1:
-		print("can't move!")
+		
+	var tile_data = GlobalTileData.tile_defs.get(str(map[new_y][new_x]), {})
+	
+	if tile_data.isWall == 1 or tile_data.isWall == 2:
+		if self.entity_type == 1:
+			MessageBox.say("You cannot pass through the %s." % tile_data.name)
+		print("The %s blocks %s " % [tile_data.name, self])
 		return false
 	if world.occupied_tiles.has(target_pos):
 		var blocker = world.occupied_tiles[target_pos]
 		if blocker.has_method("is_blocking") and blocker.is_blocking():
-			print("There's a %s blocking the way." % blocker.name)
+			print("The %s blocks %s " % [blocker.name, self])
 			return false
 		
 	var old_pos = Vector2i(grid_x, grid_y)
@@ -1280,7 +1357,6 @@ func generate_dungeon(width: int, height: int, recipe_override: Dictionary = {})
 			
 	map = carve_corridors(map, cfg)
 	map = place_doors(map, cfg)
-	map = place_entrance_exit(map, cfg)
 	
 	return map
 	
@@ -1329,8 +1405,14 @@ func place_doors(map: Array, cfg: Dictionary) -> Array:
 	
 	for y in range(1, height - 1):
 		for x in range(1, width - 1):
-			if map[y][x] == 1:
-				if map[y][x - 1] == 1 and map[y][x + 1] == 1 and map[y - 1][x] == 0 and map[y + 1][x] == 0:
+			if map[y][x] != 1:
+				continue
+				
+			if map[y][x-1] == 1 and map[y][x+1] == 1 and map[y-1][x] == 0 and map[y+1][x] == 0:
+				if map[y-1][x-1] == 1 or map[y-1][x+1] == 1 or map[y+1][x-1] == 1 or map[y+1][x+1] == 1:
+					map[y][x] = 3
+			elif map[y-1][x] == 1 and map[y+1][x] == 1 and map[y][x-1] == 0 and map[y][x+1] == 0:
+				if map[y-1][x-1] == 1 or map[y+1][x-1] == 1 or map[y-1][x+1] == 1 or map[y+1][x+1] == 1:
 					map[y][x] = 3
 					
 	return map
@@ -1700,6 +1782,7 @@ var direction_vectors = [
 	Vector2i(0, 1),   # S
 	Vector2i(1, 0)    # W
 ]
+#var entity_type := 1
 var minimap: Node = null
 var input_held := false
 var input_direction := Vector2i.ZERO
@@ -1717,6 +1800,9 @@ var stats := {
 	"Edge": 5,
 	"Grit": 5
 }
+
+func _ready():
+	entity_type = 1
 
 func get_stat(stat_name: String) -> int:
 	return stats.get(stat_name, 0)
@@ -1841,7 +1927,7 @@ func interact():
 	for entity in get_tree().get_nodes_in_group("entities"):
 		if entity.grid_x == target_pos.x and entity.grid_y == target_pos.y:
 			if entity.has_method("interact"):
-				entity.interact()
+				entity.interact(Vector2i(grid_x, grid_y))
 			return
 	MessageBox.say("You see nothing of interest.")
 	
@@ -1907,7 +1993,10 @@ func reveal_tiles(minimap):
 				if pos.x < 0 or pos.x >= map[0].size() or pos.y < 0 or pos.y >= map.size():
 					break
 
-				if map[pos.y][pos.x] == 0:
+				var tile_id = map[pos.y][pos.x]
+				var tile_data = GlobalTileData.tile_defs.get(str(tile_id), {})
+				
+				if tile_data.isWall == 1 or tile_data.isWall == 3:
 					minimap.mark_tile_visible(pos)
 					break
 

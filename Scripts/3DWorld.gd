@@ -147,7 +147,7 @@ func spawn_player():
 	occupied_tiles[entrance_tile] = player
 	player.grid_x = player_spawn.x
 	player.grid_y = player_spawn.y
-	player.facing = 2
+	#player.facing = 2
 	player.target_rotation_y = player.facing * 90
 	player.rotation_degrees.y = player.target_rotation_y
 	player.map = map
