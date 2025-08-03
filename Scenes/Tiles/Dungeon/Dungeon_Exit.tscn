@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://c2josq6wib67a" path="res://Assets/3DTiles/Dungeon/dungeon_stairdown.gltf" id="1_33ylm"]
 [ext_resource type="PackedScene" uid="uid://cfebutne2pe0m" path="res://Scenes/Tiles/_TileBase.tscn" id="1_jl4ty"]
 
-[node name="TileBase" instance=ExtResource("1_jl4ty")]
+[node name="Exit" instance=ExtResource("1_jl4ty")]
 
 [node name="blockbench_export" parent="." index="0" instance=ExtResource("1_33ylm")]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)

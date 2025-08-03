@@ -108,6 +108,8 @@ func generate_map():
 				if tile_id == 3: # doors
 					var rot = get_door_rotation(x, y)
 					tile.rotation_degrees.y = rot
+					tile.grid_x = x
+					tile.grid_y = y
 					
 				if tile_id == 4: # entrance
 					entrance_tile = Vector2i(x, y)

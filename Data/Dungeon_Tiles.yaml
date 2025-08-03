@@ -20,7 +20,7 @@
   isWall: 1
 
 3:
-  name: Dungeon Door
+  name: Oaken Door
   icon: door
   examine: The tall, oaken door stands before you, foreboding and impassive. What lies beyond, treasure or misfortune?
   color: [150, 75, 0]
@@ -38,4 +38,10 @@
   icon: exit
   examine: A rusted trap door is set into the floor. This must be the way deeper into the dungeon.
   color: [1, 50, 34]
+  isWall: 0
+6:
+  name: Open Door
+  icon: door
+  examine: The yawning entrance looms before you, ajar and forboding. A step forward is now all that remains between you and the other side.
+  color: [150, 75, 0]
   isWall: 0

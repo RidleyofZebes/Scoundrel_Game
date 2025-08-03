@@ -1,9 +1,16 @@
-[gd_scene load_steps=3 format=3 uid="uid://cibu43avmxbgh"]
+[gd_scene load_steps=4 format=3 uid="uid://cibu43avmxbgh"]
 
 [ext_resource type="PackedScene" uid="uid://cfebutne2pe0m" path="res://Scenes/Tiles/_TileBase.tscn" id="1_exvmf"]
 [ext_resource type="PackedScene" uid="uid://cef2chsxrksf4" path="res://Assets/3DTiles/Dungeon/dungeon_door.gltf" id="1_pl7a8"]
+[ext_resource type="Script" uid="uid://bsj0drfoo51js" path="res://Scripts/Door.gd" id="2_0fhax"]
 
-[node name="TileBase" instance=ExtResource("1_exvmf")]
+[node name="Door" instance=ExtResource("1_exvmf")]
+script = ExtResource("2_0fhax")
 
 [node name="blockbench_export" parent="." index="0" instance=ExtResource("1_pl7a8")]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+
+[node name="Door2" parent="blockbench_export/Node" index="3"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -0.5, 0, 0)
+
+[editable path="blockbench_export"]

@@ -38,12 +38,10 @@ func _ready():
 func try_move(dx: int, dy: int) -> bool:
 	if moving:
 		return false
-
+		
 	var new_x = grid_x + dx
 	var new_y = grid_y + dy
 	var target_pos = Vector2i(new_x, new_y)
-	
-
 	
 	if new_y < 0 or new_y >= map.size() or new_x < 0 or new_x >= map[0].size():
 		print("can't move to ", new_x, " ", new_y, ", out of bounds!")
