@@ -9,15 +9,15 @@ func _ready():
 	load_containers()
 	
 func load_items():
-	var file = FileAccess.open("res://Data/items.json", FileAccess.READ)
+	var file = FileAccess.open("res://Data/items.yaml", FileAccess.READ)
 	if file:
-		item_defs = JSON.parse_string(file.get_as_text())
+		item_defs = YAML.parse(file.get_as_text()).get_data()
 		file.close()
 		
 func load_containers():
-	var file = FileAccess.open("res://Data/containers.json", FileAccess.READ)
+	var file = FileAccess.open("res://Data/containers.yaml", FileAccess.READ)
 	if file:
-		container_defs = JSON.parse_string(file.get_as_text())
+		container_defs = YAML.parse(file.get_as_text()).get_data()
 		file.close()
 		
 func get_item_data(id: String) -> Dictionary:

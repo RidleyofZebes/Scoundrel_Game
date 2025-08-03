@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cibu43avmxbgh"]
 
 [ext_resource type="PackedScene" uid="uid://cfebutne2pe0m" path="res://Scenes/Tiles/_TileBase.tscn" id="1_exvmf"]
-[ext_resource type="PackedScene" uid="uid://cxl7h4g483i1" path="res://Assets/3DTiles/Dungeon/dungeon_door.gltf" id="1_pl7a8"]
+[ext_resource type="PackedScene" uid="uid://cef2chsxrksf4" path="res://Assets/3DTiles/Dungeon/dungeon_door.gltf" id="1_pl7a8"]
 
 [node name="TileBase" instance=ExtResource("1_exvmf")]
 

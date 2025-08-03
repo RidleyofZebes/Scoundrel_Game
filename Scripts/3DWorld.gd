@@ -25,7 +25,6 @@ var ui_root: Node = null
 var exit_tile: Vector2i = Vector2i(-1, -1)
 var entrance_tile: Vector2i = Vector2i(-1, -1)
 var player_spawn: Vector2i = Vector2i(-1, -1)
-var entrance_dir
 
 func load_dungeon_tiles():
 	tile_scenes = {
@@ -46,33 +45,88 @@ func load_forest_tiles():
 #		3: preload(),
 	}
 	GlobalTileData.load_tiles("res://Data/Forest_Tiles.json")
-
+	
+func get_door_rotation(x: int, y: int) -> float:
+	var north = map[y-1][x] if y > 0 else -1
+	var south = map[y+1][x] if y < map.size()-1 else -1
+	var west  = map[y][x-1] if x > 0 else -1
+	var east  = map[y][x+1] if x < map.size()-1 else -1
+	
+	var north_south = (north == 1 or south == 1)
+	var east_west = (east == 1 or west == 1)
+	
+	if east_west and not north_south:
+		return 90.0
+	return 0.0
+	
+func get_entrance_rotation(entrance: Vector2i, floor: Vector2i) -> float:
+	var dir = floor - entrance  # Vector2i
+	var rot
+	if dir == Vector2i(0, 1):   # floor is south of entrance
+		rot = 0.0
+	elif dir == Vector2i(0, -1): # floor is north of entrance
+		rot = 180.0
+	elif dir == Vector2i(1, 0):  # floor is east of entrance
+		rot = 90.0
+	elif dir == Vector2i(-1, 0): # floor is west of entrance
+		rot = 270.0
+	return rot
+	
+func random_rotate():
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	var rotations = [0, 90, 180, 270]
+	var random_angle = rotations[rng.randi_range(0, 3)]
+	return random_angle
+	
 func generate_map():
 	spawn_tiles.clear()
 	GlobalTileData.load_tiles()
+	
+	var entrance_node : TileBase = null
+	entrance_tile = Vector2i(-1, -1)
+	exit_tile = Vector2i(-1, -1)
+	player_spawn = Vector2i(-1, -1)
+	
 	for y in range(map.size()):
 		for x in range(map[0].size()):
 			var tile_id = map[y][x]
 			if tile_scenes.has(tile_id):
 				var scene = tile_scenes[tile_id]
 				var tile: TileBase = scene.instantiate()
+				
 				tile.position = Vector3(x, -0.5, y)
 				tile.tile_id = tile_id
 				tile_root.add_child(tile)
 				
-				if tile_id == 2:  # Tree cluster tile
-					var rng = RandomNumberGenerator.new()
-					rng.randomize()
-					var rotations = [0, 90, 180, 270]
-					var random_angle = rotations[rng.randi_range(0, 3)]
-					tile.rotation_degrees.y = random_angle
-				
-				if tile_id == 1:
+				if tile_id == 1: # floor tiles
 					spawn_tiles.append(Vector2i(x, y))
-				#elif tile_id == 4:
-					#entrance_tile = Vector2i(x, y)
-				#elif tile_id == 5:
-					#exit_tile = Vector2i(x, y)
+				
+				if tile_id == 2: # special wall tiles
+					tile.rotation_degrees.y = random_rotate()
+				
+				if tile_id == 3: # doors
+					var rot = get_door_rotation(x, y)
+					tile.rotation_degrees.y = rot
+					
+				if tile_id == 4: # entrance
+					entrance_tile = Vector2i(x, y)
+					entrance_node = tile
+					
+				if tile_id == 5: # exit
+					exit_tile = Vector2i(x, y)
+					
+	if entrance_tile != Vector2i(-1, -1):
+		var dirs = [Vector2i(0,1), Vector2i(1,0), Vector2i(0,-1), Vector2i(-1,0)]
+		for dir in dirs:
+			var check = entrance_tile + dir
+			if check.x >= 0 and check.x < map[0].size() and check.y >= 0 and check.y < map.size():
+				if map[check.y][check.x] == 1:
+					player_spawn = check
+					break
+				
+	if entrance_node:
+			entrance_node.rotation_degrees.y = get_entrance_rotation(entrance_tile, player_spawn)
 					
 	if spawn_tiles.has(entrance_tile):
 		spawn_tiles.erase(entrance_tile)
@@ -97,7 +151,7 @@ func spawn_player():
 	player.map = map
 	player.vision_mode = 2
 	player.ui = ui
-	player.position = Vector3(entrance_tile[0], 0, entrance_tile[1])
+	player.position = Vector3(player_spawn[0], 0, player_spawn[1])
 	var minimap = get_node(minimap_path)
 	player.minimap = minimap
 	player.world = self
@@ -174,40 +228,25 @@ func update_minimap_entities():
 			
 func generate_world(map_type: String, variant: String, steps: int, enemies: int) -> void:
 	var env_resource: Environment
-	match map_type:
-		"dungeon":
-			match variant:
-				"pitchblack":
-					env_resource = preload("res://Scenes/Environments/Dungeon_Pitchblack.tres")
-				_:
-					push_warning("Unknown environment, using default!")
-					return
-			load_dungeon_tiles()
-			var dungeon_result = DungeonGenerator.generate(steps, steps)
-			map = dungeon_result["map"]
-			player_spawn = dungeon_result["player_spawn"]
-			entrance_tile = dungeon_result["entrance_tile"]
-			entrance_dir = dungeon_result["entrance_dir"]
-			exit_tile = dungeon_result["exit_tile"]
-		"forest":
-			match variant:
-				"sunny":
-					env_resource = preload("res://Scenes/Environments/Forest_Sunny.tres")
-				"moonlit":
-					env_resource = preload("res://Scenes/Environments/Forest_Moonlit.tres")
-				_:
-					env_resource = preload("res://Scenes/Environments/Forest_Sunny.tres")
-			load_forest_tiles()
-			map = MapGenerator.drunken_forest(steps)
+	match variant:
+		"sunny":
+			env_resource = preload("res://Scenes/Environments/Sunny.tres")
+		"moonlit":
+			env_resource = preload("res://Scenes/Environments/Moonlit.tres")
+		"pitchblack":
+			env_resource = preload("res://Scenes/Environments/Pitchblack.tres")
 		_:
-			push_error("Unknown map type: " + map_type)
-			return
+			push_warning("Unknown environment, using default!")
+			env_resource = preload("res://Scenes/Environments/Pitchblack.tres")
+			
+	load_dungeon_tiles()
+	map = MapGenerator.generate_map(map_type, steps)
 			
 	$WorldEnvironment.environment = env_resource
 	generate_map()
 	spawn_player()
 	spawn_enemies(enemies)
-	spawn_chests(50)
+	spawn_chests(5)
 	
 	var minimap = get_node(minimap_path)
 	minimap.set_map_data(map)

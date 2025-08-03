@@ -8,6 +8,7 @@ var direction_vectors = [
 	Vector2i(0, 1),   # S
 	Vector2i(1, 0)    # W
 ]
+#var entity_type := 1
 var minimap: Node = null
 var input_held := false
 var input_direction := Vector2i.ZERO
@@ -25,6 +26,9 @@ var stats := {
 	"Edge": 5,
 	"Grit": 5
 }
+
+func _ready():
+	entity_type = 1
 
 func get_stat(stat_name: String) -> int:
 	return stats.get(stat_name, 0)

@@ -1,0 +1,2010 @@
+##3DWorld.gd
+extends Node3D
+
+@export var player_entity: PackedScene
+@export var enemy_entity: PackedScene
+@export var minimap_path: NodePath
+@export var chest_scene: PackedScene  # Temporary until I figure this out. Can't just have a line for every one of the damned things.
+@onready var tile_root   = $TileRoot
+@onready var entity_root = $EntityRoot
+@onready var loading_screen := $"../../../LoadingScreen"
+@onready var UI_root := $"../../../UI"
+
+# var map = MapGenerator.drunken_walk(2400)
+# var map = MapGenerator.drunken_forest(2400)
+var map
+# var map = MapGenerator.void_platform(32) # debug room
+
+var tile_scenes: Dictionary = {}
+var spawn_tiles = []
+var occupied_tiles: Dictionary = {}
+var player : Node3D
+var ui : Node = null
+var menu_screen: Control = null
+var minimap: TextureRect = null
+var ui_root: Node = null
+var exit_tile: Vector2i = Vector2i(-1, -1)
+var entrance_tile: Vector2i = Vector2i(-1, -1)
+var player_spawn: Vector2i = Vector2i(-1, -1)
+
+func load_dungeon_tiles():
+	tile_scenes = {
+		0: preload("res://Scenes/Tiles/Dungeon/Dungeon_Wall.tscn"),
+		1: preload("res://Scenes/Tiles/Dungeon/Dungeon_Floor.tscn"),
+#		2: preload(), # Void
+		3: preload("res://Scenes/Tiles/Dungeon/Dungeon_Door.tscn"),
+		4: preload("res://Scenes/Tiles/Dungeon/Dungeon_Entrance.tscn"),
+		5: preload("res://Scenes/Tiles/Dungeon/Dungeon_Exit.tscn"),
+	}
+	GlobalTileData.load_tiles("res://Data/Dungeon_Tiles.json")
+
+func load_forest_tiles():
+	tile_scenes = {
+		0: preload("res://Scenes/Tiles/Forest/Forest_Wall.tscn"),
+		1: preload("res://Scenes/Tiles/Forest/Forest_Floor.tscn"),
+		2: preload("res://Scenes/Tiles/Forest/Forest_Trees.tscn"),
+#		3: preload(),
+	}
+	GlobalTileData.load_tiles("res://Data/Forest_Tiles.json")
+	
+func get_door_rotation(x: int, y: int) -> float:
+	var north = map[y-1][x] if y > 0 else -1
+	var south = map[y+1][x] if y < map.size()-1 else -1
+	var west  = map[y][x-1] if x > 0 else -1
+	var east  = map[y][x+1] if x < map.size()-1 else -1
+	
+	var north_south = (north == 1 or south == 1)
+	var east_west = (east == 1 or west == 1)
+	
+	if east_west and not north_south:
+		return 90.0
+	return 0.0
+	
+func get_entrance_rotation(entrance: Vector2i, floor: Vector2i) -> float:
+	var dir = floor - entrance  # Vector2i
+	var rot
+	if dir == Vector2i(0, 1):   # floor is south of entrance
+		rot = 0.0
+	elif dir == Vector2i(0, -1): # floor is north of entrance
+		rot = 180.0
+	elif dir == Vector2i(1, 0):  # floor is east of entrance
+		rot = 90.0
+	elif dir == Vector2i(-1, 0): # floor is west of entrance
+		rot = 270.0
+	return rot
+	
+func random_rotate():
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	var rotations = [0, 90, 180, 270]
+	var random_angle = rotations[rng.randi_range(0, 3)]
+	return random_angle
+	
+func generate_map():
+	spawn_tiles.clear()
+	GlobalTileData.load_tiles()
+	
+	var entrance_node : TileBase = null
+	entrance_tile = Vector2i(-1, -1)
+	exit_tile = Vector2i(-1, -1)
+	player_spawn = Vector2i(-1, -1)
+	
+	for y in range(map.size()):
+		for x in range(map[0].size()):
+			var tile_id = map[y][x]
+			if tile_scenes.has(tile_id):
+				var scene = tile_scenes[tile_id]
+				var tile: TileBase = scene.instantiate()
+				
+				tile.position = Vector3(x, -0.5, y)
+				tile.tile_id = tile_id
+				tile_root.add_child(tile)
+				
+				if tile_id == 1: # floor tiles
+					spawn_tiles.append(Vector2i(x, y))
+				
+				if tile_id == 2: # special wall tiles
+					tile.rotation_degrees.y = random_rotate()
+				
+				if tile_id == 3: # doors
+					var rot = get_door_rotation(x, y)
+					tile.rotation_degrees.y = rot
+					
+				if tile_id == 4: # entrance
+					entrance_tile = Vector2i(x, y)
+					entrance_node = tile
+					
+				if tile_id == 5: # exit
+					exit_tile = Vector2i(x, y)
+					
+	if entrance_tile != Vector2i(-1, -1):
+		var dirs = [Vector2i(0,1), Vector2i(1,0), Vector2i(0,-1), Vector2i(-1,0)]
+		for dir in dirs:
+			var check = entrance_tile + dir
+			if check.x >= 0 and check.x < map[0].size() and check.y >= 0 and check.y < map.size():
+				if map[check.y][check.x] == 1:
+					player_spawn = check
+					break
+				
+	if entrance_node:
+			entrance_node.rotation_degrees.y = get_entrance_rotation(entrance_tile, player_spawn)
+					
+	if spawn_tiles.has(entrance_tile):
+		spawn_tiles.erase(entrance_tile)
+	if spawn_tiles.has(exit_tile):
+		spawn_tiles.erase(exit_tile)
+					
+	print("Generated ", spawn_tiles.size(), " floor tiles.")
+
+func spawn_player():
+	player = player_entity.instantiate()
+	
+	if entrance_tile == Vector2i(-1, -1) or player_spawn == Vector2i(-1, -1):
+		push_error("No entrance or spawn tile set! Check your generation logic, dumbass.")
+		return
+	
+	occupied_tiles[entrance_tile] = player
+	player.grid_x = player_spawn.x
+	player.grid_y = player_spawn.y
+	player.facing = 2
+	player.target_rotation_y = player.facing * 90
+	player.rotation_degrees.y = player.target_rotation_y
+	player.map = map
+	player.vision_mode = 2
+	player.ui = ui
+	player.position = Vector3(player_spawn[0], 0, player_spawn[1])
+	var minimap = get_node(minimap_path)
+	player.minimap = minimap
+	player.world = self
+	entity_root.add_child(player)
+	GameState.player = player
+	var camera = player.get_node("Camera3D")
+	$HoverDetector.set_camera(camera)
+	player.setup_light()
+	player.call_deferred("reveal_all_minimaps")
+	
+func spawn_enemies(n):
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	for i in range(n):
+		var e = enemy_entity.instantiate()
+		var pick = spawn_tiles[rng.randi_range(0, spawn_tiles.size()-1)]
+		if occupied_tiles.has(pick):
+			continue
+		e.grid_x = pick.x; e.grid_y = pick.y
+		e.map = map
+		e.facing = rng.randi_range(0, 3)
+		e.target_rotation_y = e.facing * 90
+		e.position = Vector3(pick.x, 0, pick.y)
+		e.is_enemy = true
+		e.player = player
+		e.add_to_group("enemies")
+		e.world = self
+		var enemy_id = GlobalEnemyData.get_random_enemy()
+		e.enemy_id = enemy_id
+		entity_root.add_child(e)
+		occupied_tiles[pick] = e
+		e.setup_light()
+		
+func spawn_chests(amount: int = 5):
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	
+	for i in range(amount):
+		var chest = chest_scene.instantiate()
+		
+		var pos: Vector2i = spawn_tiles[rng.randi_range(0, spawn_tiles.size() - 1)]
+		if occupied_tiles.has(pos):
+			continue
+			
+		chest.position = Vector3(pos.x, 0, pos.y)
+		chest.grid_x = pos.x
+		chest.grid_y = pos.y
+		occupied_tiles[pos] = chest
+		tile_root.add_child(chest)
+		
+func end_player_turn():
+	for child in entity_root.get_children():
+		if child.has_method("take_turn"):
+			child.active = true
+	await get_tree().process_frame
+	update_minimap_entities()
+			
+func update_minimap_entities():
+	var visible_positions = []
+	var minimap = get_node(minimap_path)
+	var visible = minimap.visible_tiles.keys()
+	
+	for e in get_tree().get_nodes_in_group("enemies"):
+		if not is_instance_valid(e) or e.get_parent() == null:
+			continue
+		var pos = Vector2i(e.grid_x, e.grid_y)
+		if visible.has(pos):
+			visible_positions.append(pos)
+	
+	minimap.set_entities(visible_positions)
+	
+	if GameState.menu_minimap:
+		GameState.menu_minimap.set_entities(visible_positions)
+			
+func generate_world(map_type: String, variant: String, steps: int, enemies: int) -> void:
+	var env_resource: Environment
+	match variant:
+		"sunny":
+			env_resource = preload("res://Scenes/Environments/Sunny.tres")
+		"moonlit":
+			env_resource = preload("res://Scenes/Environments/Moonlit.tres")
+		"pitchblack":
+			env_resource = preload("res://Scenes/Environments/Pitchblack.tres")
+		_:
+			push_warning("Unknown environment, using default!")
+			env_resource = preload("res://Scenes/Environments/Pitchblack.tres")
+			
+	load_dungeon_tiles()
+	map = MapGenerator.generate_map(map_type, steps)
+			
+	$WorldEnvironment.environment = env_resource
+	generate_map()
+	spawn_player()
+	spawn_enemies(enemies)
+	spawn_chests(5)
+	
+	var minimap = get_node(minimap_path)
+	minimap.set_map_data(map)
+	minimap.set_player_pos(Vector2i(player.grid_x, player.grid_y), player.facing)
+	GameState.menu_minimap.set_map_data(map)
+	GameState.menu_minimap.set_player_pos(Vector2i(player.grid_x, player.grid_y), player.facing)
+	update_minimap_entities()
+	MessageBox.say("You venture forth into the unknown...")
+	
+func toggle_loading_screen(show: bool):
+	if loading_screen:
+		loading_screen.visible = show
+		if show:
+			loading_screen.move_to_front()
+			
+	UI_root.visible = not show
+	
+func _ready() -> void:
+	GameState.world = self
+	toggle_loading_screen(true)
+	await get_tree().process_frame
+	generate_world("dungeon", "pitchblack", 50, 10)
+	toggle_loading_screen(false)
+	MessageBox.show()
+	
+func reveal_all_entities():
+	var all_entity_positions := []
+	for e in get_tree().get_nodes_in_group("enemies"):
+		if is_instance_valid(e) and e.get_parent() != null:
+			all_entity_positions.append(Vector2i(e.grid_x, e.grid_y))
+	var minimap = get_node_or_null(minimap_path)
+	if minimap:
+		minimap.set_entities(all_entity_positions)
+	if GameState.menu_minimap:
+		GameState.menu_minimap.set_entities(all_entity_positions)
+
+
+##Chest.gd
+extends Node
+
+
+@export var container_type: String = "chest"
+@onready var animation_player := $blockbench_export/AnimationPlayer
+
+var inventory := Inventory.new()
+var is_open := false
+var examine_text := ""
+var display_name := "Chest"
+var grid_x: int = 0
+var grid_y: int = 0
+var icon: Texture = preload("res://Assets/Interface/map_stencil.png") # TODO FIX PLACEHOLDER
+
+func _ready() -> void:
+	add_to_group("entities")
+	var container_data = ItemDB.get_container_data(container_type)
+	var capacity = container_data.get("slots", 5)
+	inventory.set_capacity(capacity)
+	
+	
+	examine_text = container_data.get("examine", "You put things in it? Maybe?")
+	display_name = container_data.get("name", "Container?")
+	
+	if animation_player.has_animation("Close"):
+		animation_player.play("Close")
+		animation_player.seek(0.0, true)
+	
+func interact():
+	if not is_open:
+		open()
+		
+func is_blocking() -> bool:
+	return false
+
+func open():
+	if not is_open:
+		is_open = true
+		if animation_player.has_animation("Open"):
+			animation_player.play("Open")
+			await animation_player.animation_finished
+			_on_chest_opened("Open")
+		else:
+			_on_chest_opened("Open")
+		
+		
+func _on_chest_opened(anim_name: String) -> void:
+	if anim_name == "Open":
+		print("The chest contains:", inventory.get_items())
+		print("Opening container:", self)
+		GameState.open_container(self)
+		
+func close():
+	if is_open:
+		is_open = false
+		if animation_player.has_animation("Close"):
+			animation_player.play("Close")
+
+
+##death_screen.gd
+extends CanvasLayer
+
+
+@onready var label = $CenterContainer/VBoxContainer/Label
+
+const TITLE_SCREEN := preload("res://Scenes/UI Elements/TitleScreen.tscn")
+
+func _ready() -> void:
+	print("TITLE_SCREEN is valid:", TITLE_SCREEN)
+	hide()
+	get_tree().paused = false
+	
+	$CenterContainer/VBoxContainer/Retry.pressed.connect(func(): resume())
+	$CenterContainer/VBoxContainer/Quit.pressed.connect(func(): call_deferred("return_to_title"))
+	
+func show_death(message: String = "Oops..."):
+	label.text = message
+	show()
+	get_tree().paused = true
+	
+func resume():
+	hide()
+	get_tree().paused = false
+	
+func return_to_title():
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://Scenes/UI Elements/TitleScreen.tscn")
+
+
+##Enemy.gd
+extends "res://Scripts/EntityBase.gd"
+
+@export var enemy_id: String = ""
+var active := false
+var display_name: String = "???"
+var weapon: String = "fist"
+
+func _ready():
+	super._ready()
+	if GlobalEnemyData.enemy_defs.has(enemy_id):
+		var data = GlobalEnemyData.enemy_defs[enemy_id]
+		name = enemy_id
+		display_name = data.get("name", "???")
+		var health = data.get("hp", 10)
+		var vision_mode = data.get("viewrange", 6)
+		examine_text = data.get("examine", "...")
+		weapon = data.get("weapon", "fist")
+		var damage_array = data.get("damage", [1, 4])
+		damage_range = Vector2i(damage_array[0], damage_array[1])
+		var sprite_path = data.get("sprite", "")
+		if sprite_path != "":
+			var texture = load(sprite_path)
+			$EntitySprite.texture = texture
+		else:
+			push_warning("No sprite defined for " + enemy_id)
+		print("Spawned ", name)
+	else:
+		push_error("Unknown enemy ID: " + enemy_id)
+
+func take_turn():
+	if moving: return
+	
+	if not player:
+		print("Enemy has no player reference!")
+		return
+			
+	var dx = player.grid_x - grid_x
+	var dy = player.grid_y - grid_y
+	var dist = abs(dx) + abs(dy)
+	
+	if dist == 1:
+		print("Enemy Attacks!")
+		var rng = RandomNumberGenerator.new()
+		rng.randomize()
+		var damage = randi_range(damage_range[0], damage_range[1])
+		MessageBox.say("The %s attacks you with %s for %d damage" % [display_name, weapon, damage])
+		player.take_damage(0) # MARKED 0 FOR DEBUG - CHANGE BEFORE RELEASE
+		return
+	
+	var move_dir := Vector2i.ZERO
+	if abs(dx) > abs(dy):
+		move_dir.x = sign(dx)
+	else:
+		move_dir.y = sign(dy)
+		
+	if try_move(move_dir.x, move_dir.y):
+		print("Enemy moves toward player.")
+	else:
+		print("Enemy failed to move.")
+	
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	if active:
+		print("Enemy taking turn...")
+		take_turn()
+		active = false
+
+
+##EnemyData.gd
+extends Node
+class_name EnemyRegistry
+
+var enemy_defs
+
+func _ready():
+	var file = FileAccess.open("res://Data/enemy_types.yaml", FileAccess.READ)
+	if file:
+		var yaml_string = file.get_as_text()
+		var result = YAML.parse(yaml_string)
+		enemy_defs = result.get_data()
+	else:
+		push_error("Could not load enemy_types.yaml")
+
+func get_random_enemy() -> String:
+	var weighted_pool = []
+	for id in enemy_defs.keys():
+		var weight = int(enemy_defs[id].get("weight", 1))
+		for i in range(weight):
+			weighted_pool.append(id)
+			
+	if weighted_pool.is_empty():
+		push_error("No enemies in weight pool!")
+		return ""
+		
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	return weighted_pool[rng.randi_range(0, weighted_pool.size() - 1)]
+
+
+##EntityBase.gd
+extends Node3D
+
+
+@export var is_enemy: bool = false
+@onready var glow_sprite := $GlowSprite
+
+#@onready var tween = $MoveTween
+
+enum VisionMode { BLIND, DARKVISION, TORCH, LANTERN, BULLSEYE}
+
+var world: Node = null
+var player: Node3D = null
+var ui: Node = null
+var grid_x: int
+var grid_y: int
+var health: int = 10
+var damage_range: Vector2i = Vector2i(1, 4)
+var vision_mode: int
+var examine_text: String
+var map: Array = []
+var facing: int  # 0=N, 1=E, 2=S, 3=W
+var current_rotation_y: float = 0.0
+var target_rotation_y: float = 0.0
+var move_duration: float = 0.2  # seconds to move one tile
+var move_elapsed: float = 0.0
+var start_position: Vector3
+var end_position: Vector3
+var moving: bool = false
+
+
+
+func _ready():
+	current_rotation_y = rotation_degrees.y
+	print("Entity ready: ", self.name)
+	add_to_group("entities")
+
+func try_move(dx: int, dy: int) -> bool:
+	if moving:
+		return false
+	
+	var new_x = grid_x + dx
+	var new_y = grid_y + dy
+	var target_pos = Vector2i(new_x, new_y)
+	if new_y < 0 or new_y >= map.size() or new_x < 0 or new_x >= map[0].size():
+		print("can't move to ", new_x, " ", new_y, ", out of bounds!")
+		return false
+	if map[new_y][new_x] != 1:
+		print("can't move!")
+		return false
+	if world.occupied_tiles.has(target_pos):
+		var blocker = world.occupied_tiles[target_pos]
+		if blocker.has_method("is_blocking") and blocker.is_blocking():
+			print("There's a %s blocking the way." % blocker.name)
+			return false
+		
+	var old_pos = Vector2i(grid_x, grid_y)
+	world.occupied_tiles.erase(old_pos)
+	world.occupied_tiles[target_pos] = self
+		
+	grid_x = new_x
+	grid_y = new_y
+	moving = true
+	start_position = position
+	end_position = Vector3(grid_x, 0, grid_y)
+	#move_elapsed = 0.0
+	
+	var tween = create_tween()
+	tween.tween_property(self, "global_position", end_position, move_duration)
+	tween.finished.connect(func(): moving = false, CONNECT_ONE_SHOT)
+	
+
+	print("Moving from ", start_position, " to ", end_position)
+
+	return true
+	
+func turn(direction):
+	facing = (facing + direction) % 4
+	if facing < 0:
+		facing += 4
+	target_rotation_y = float(facing * 90.0)
+	
+	var current_y = rotation_degrees.y
+	var delta_angle = wrapf(target_rotation_y - current_rotation_y + 180.0, 0.0, 360.0) - 180.0
+	var final_rotation = current_y + delta_angle
+	
+	var tween = create_tween()
+	tween.tween_property(self, "rotation_degrees:y", final_rotation, 0.15)
+	current_rotation_y = final_rotation
+	
+	var minimap = get_tree().get_root().get_node("Main/UI/2dMinimap")
+	minimap.set_player_pos(Vector2i(grid_x, grid_y), facing)
+	print("Now facing: ", facing)
+	
+#func set_rotation_y(val: float) -> void:
+	#rotation_degrees.y = val
+	
+func take_damage(amount):
+	health -= amount
+	if health <= 0:
+		call_deferred("die")
+		
+func is_blocking() -> bool:
+	return true  # Can be toggled for ghosts etc.
+
+func die():
+	if not is_enemy:
+		var death_screen = get_tree().get_root().get_node("Main/DeathScreen")
+		death_screen.show_death("You were slain...")
+	else:
+		var current_pos = Vector2i(grid_x, grid_y)
+		world.occupied_tiles.erase(current_pos)
+		remove_from_group("entities")
+		call_deferred("queue_free")
+		if is_instance_valid(world) and world.has_method("refresh_minimap_entities"):
+			world.call_deferred("refresh_minimap_entities")
+			
+func set_highlight(enabled: bool) -> void:
+	if glow_sprite:
+		glow_sprite.visible = enabled
+		
+func get_examine_text() -> String:
+	return examine_text if examine_text != "" else "It stares back at you..."
+	
+func setup_light():
+	match vision_mode:
+		VisionMode.BLIND:
+			return # You can't see shit
+			
+		VisionMode.DARKVISION:
+			var light = OmniLight3D.new()
+			light.omni_range = 12
+			light.light_energy = 0.6
+			light.light_color = Color(0.8, 0.8, 0.8)
+			add_child(light)
+			
+		VisionMode.TORCH:
+			var light = OmniLight3D.new()
+			light.omni_range = 5
+			light.light_energy = 2.0
+			light.light_color = Color(1.0, 0.8, 0.6)
+			add_child(light)
+			
+		VisionMode.LANTERN:
+			var light = OmniLight3D.new()
+			light.omni_range = 7
+			light.light_energy = 2.5
+			add_child(light)
+			
+		VisionMode.BULLSEYE:
+			var light = SpotLight3D.new()
+			light.spot_range = 10
+			light.spot_angle = 45
+			light.light_energy = 4.0
+			light.light_color = Color(1.0, 1.0, 0.8)
+			light.rotation_degrees.y = facing * 180.0
+			add_child(light)
+
+func _process(delta):
+	pass
+
+
+##GameState.gd
+extends Node
+
+const Player = preload("res://Scripts/Player.gd")
+
+enum CursorMode { DEFAULT, LOOK, ATTACK, INTERACT, MOVE}
+enum MenuType { NONE, MAP, INVENTORY, OPTIONS}
+var current_mode: CursorMode = CursorMode.DEFAULT
+var menu_type: MenuType = MenuType.NONE
+var menu_screen: Control = null
+var minimap: TextureRect = null          # HUD minimap
+var menu_minimap: TextureRect = null     # Menu fullscreen minimap
+var ui_root: CanvasLayer = null
+var player: Player = null
+var inventory_ui: Control = null
+var menu_tabs: TabContainer = null
+var open_container_node: Node = null
+var world: Node = null
+
+var konami_sequence := [
+	KEY_UP, KEY_UP, KEY_DOWN, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_LEFT, KEY_RIGHT, KEY_B, KEY_A, KEY_TAB, KEY_ENTER
+]
+var konami_progress := 0
+var cheats_enabled := true # TODO Change back to false when done with testing
+
+func _ready():
+	Input.set_custom_mouse_cursor(preload("res://Assets/Cursors/cursor_gauntlet.png"))
+	inventory_ui = get_node("MenuScreen/TabContainer/InventoryTab/InventoryUi")
+
+func _unhandled_input(event):
+	if not cheats_enabled and event is InputEventKey and event.pressed:
+		if event.keycode == konami_sequence[konami_progress]:
+			konami_progress += 1
+			if konami_progress == konami_sequence.size():
+				cheats_enabled = true
+				print("#### CHEATS ENABLED ####")
+				MessageBox.say("You feel a shift in the fabric of reality...!")
+				konami_progress = 0
+		else:
+			if event.keycode != konami_sequence[0] or konami_progress == 0:
+				konami_progress = 0
+	
+	if event.is_action_pressed("cursor_mode_look"):
+		set_cursor_mode(CursorMode.LOOK)
+	elif event.is_action_pressed("cursor_mode_attack"):
+		set_cursor_mode(CursorMode.ATTACK)
+	elif event.is_action_pressed("cursor_mode_interact"):
+		set_cursor_mode(CursorMode.INTERACT)
+	elif event.is_action_pressed("cursor_mode_move"):
+		set_cursor_mode(CursorMode.MOVE)
+		
+	elif event.is_action_pressed("inventory"):
+		toggle_inventory()
+	elif event.is_action_pressed("map"):
+		toggle_map()
+	elif event.is_action_pressed("ui_cancel"):
+		if menu_type != MenuType.NONE:
+			close_all_menus()
+			return
+	
+	if cheats_enabled and event is InputEventKey and event.pressed:
+		match event.keycode:
+			KEY_F1:
+				_debug_reveal_map()
+			KEY_F2:
+				_debug_reveal_entities()
+				
+func _debug_reveal_map():
+	print("#### Map Revealed ####")
+	MessageBox.say("The secrets of the realm are revealed to you...!")
+	if minimap:
+		minimap.reveal_all_tiles()
+	if menu_minimap:
+		menu_minimap.reveal_all_tiles()
+		
+func _debug_reveal_entities():
+	print("#### Entities Revealed ####")
+	MessageBox.say("Your senses expand to see beyond your limits...!")
+	if minimap:
+		world.reveal_all_entities()
+	if menu_minimap:
+		world.reveal_all_entities()
+		
+func close_all_menus():
+	if open_container_node:
+		if open_container_node.has_method("close"):
+			open_container_node.close()
+		open_container_node = null
+	menu_type = MenuType.NONE
+	menu_screen.visible = false
+	minimap.visible = true
+	menu_minimap.visible = false
+	if inventory_ui:
+		inventory_ui.close()
+		
+func toggle_inventory():
+	if menu_type == MenuType.INVENTORY:
+		close_all_menus()
+		return
+	menu_type = MenuType.INVENTORY
+	menu_screen.visible = true
+	menu_tabs.current_tab = 1
+	minimap.visible = false
+	menu_minimap.visible = true
+	inventory_ui.open(player.inventory)
+	
+func toggle_map():
+	if menu_type == MenuType.MAP:
+		close_all_menus()
+		return
+	menu_type = MenuType.MAP
+	menu_screen.visible = true
+	menu_tabs.current_tab = 0
+	minimap.visible = false
+	menu_minimap.visible = true
+		
+func toggle_menu():
+	if not menu_screen or not minimap or not menu_minimap:
+		push_warning("Missing UI references in GameState")
+		return
+
+	var is_open = not menu_screen.visible
+	menu_screen.visible = is_open
+
+	# Toggle visibility between minimaps
+	minimap.visible = not is_open
+	menu_minimap.visible = is_open
+	
+	# MessageBox.visible = not is_open
+
+	if is_open:
+		menu_minimap.set_player_pos(minimap.player_grid_pos, minimap.player_facing)
+		menu_minimap.set_entities(minimap.entity_positions)
+		menu_minimap.draw_minimap()
+		
+func open_container(container_node):
+	open_container_node = container_node
+	menu_type = MenuType.INVENTORY
+	menu_screen.visible = true
+	menu_tabs.current_tab = 1
+	minimap.visible = false
+	menu_minimap.visible = true
+	if inventory_ui:
+		inventory_ui.open(
+			player.inventory, 
+			container_node.inventory, 
+			container_node.icon
+			)
+		print("Opening container:", container_node)
+	else:
+		push_warning("Inventory UI not assigned")
+		
+func close_inventory():
+	if inventory_ui:
+		inventory_ui.close()
+		menu_screen.visible = false
+		minimap.visible = true
+		menu_minimap.visible = false
+	
+func set_cursor_mode(mode):
+	current_mode = mode
+	
+	# Look Cursor setup
+	var examine_cursor_image = preload("res://Assets/Cursors/cursor_eye.png")
+	var image_size = examine_cursor_image.get_size()
+	var hotspot = image_size / 2
+	
+	match mode:
+		CursorMode.LOOK:
+			Input.set_custom_mouse_cursor(examine_cursor_image, Input.CURSOR_ARROW, hotspot)
+		CursorMode.ATTACK:
+			Input.set_custom_mouse_cursor(preload("res://Assets/Cursors/cursor_gauntlet.png"))
+		CursorMode.INTERACT:
+			Input.set_custom_mouse_cursor(preload("res://Assets/Cursors/cursor_gauntlet.png"))
+		CursorMode.MOVE:
+			Input.set_custom_mouse_cursor(preload("res://Assets/Cursors/cursor_gauntlet.png"))
+		_:
+			Input.set_custom_mouse_cursor(null)
+			
+
+
+##HoverDetector.gd
+extends Node3D
+
+@onready var camera: Camera3D = null
+var camera_initial_position: Vector3
+const LOOK_SHIFT_RADIUS := 0.15
+var current_hovered : Node3D = null
+
+func set_camera(cam: Camera3D) -> void:
+	camera = cam
+	camera_initial_position = cam.transform.origin
+
+func _physics_process(delta: float) -> void:
+	if GameState.current_mode != GameState.CursorMode.LOOK:
+		if camera:
+			camera.transform.origin = camera_initial_position
+		clear_hover()
+		return
+		
+	var mouse_pos = get_viewport().get_mouse_position()
+	var viewport_size = get_viewport().size
+	var center = viewport_size / 2.0
+	var offset = (mouse_pos - center) / center
+	offset.x *= LOOK_SHIFT_RADIUS
+	offset.y *= -LOOK_SHIFT_RADIUS
+	var target_pos = camera_initial_position + Vector3(offset.x, offset.y, 0) 
+	camera.transform.origin = camera.transform.origin.lerp(target_pos, delta * 5.0)
+	
+	var from = camera.project_ray_origin(mouse_pos)
+	var to = from + camera.project_ray_normal(mouse_pos) * 1000
+	
+	var space_state = get_world_3d().direct_space_state
+	var ray_params = PhysicsRayQueryParameters3D.create(from, to)
+	ray_params.collision_mask = 1
+	var result = space_state.intersect_ray(ray_params)
+	
+	if result and result.has("collider"):
+		var collider = result.collider
+		if collider != current_hovered:
+			clear_hover()
+			highlight_node(collider)
+	else:
+		clear_hover()
+		
+func _unhandled_input(event: InputEvent) -> void:
+	if GameState.current_mode == GameState.CursorMode.LOOK and event.is_action_pressed("ui_accept"):
+		if current_hovered and current_hovered.has_method("get_examine_text"):
+			MessageBox.say(current_hovered.get_examine_text())
+		
+func clear_hover():
+	if current_hovered and current_hovered.has_method("set_highlight"):
+		current_hovered.set_highlight(false)
+	current_hovered = null
+	
+func highlight_node(node):
+	while node and not node.has_method("get_examine_text"):
+		node = node.get_parent()
+		
+	if node:
+		if node.has_method("set_highlight"):
+			node.set_highlight(true)
+			current_hovered = node
+			# print("hovering on: ", node.name, node.tile_id)
+
+
+##Inventory.gd
+extends Node
+
+
+class_name Inventory
+
+var slots: int = 10
+var items: Array = []
+var coinpurse: int = 0
+
+func set_capacity(size: int) -> void:
+	slots = size
+	
+func add_item(id: String, amount: int = 1) -> bool:
+	if items.size() >= slots:
+		return false
+	
+	var existing := -1
+	for i in range(items.size()):
+		if items[i].id == id:
+			existing = i
+			break
+	if existing != -1:
+		items[existing].count += amount
+	else:
+		items.append({ "id": id, "count": amount })
+		
+	return true
+	
+func remove_item(id: String, amount: int = 1) -> bool:
+	for i in range(items.size()):
+		if items[i].id == id:
+			items[i].count -= amount
+			if items[i].count <= 0:
+				items.remove_at(i)
+			return true
+	return false
+	
+func get_items() -> Array:
+	return items.duplicate()
+	
+func has_item(id: String) -> bool:
+	for item in items:
+		if item.id == id:
+			return true
+	return false
+
+func add_coins(amount: int):
+	coinpurse += amount
+	
+func get_coins() -> int:
+	return coinpurse
+
+
+##inventory_slot.gd
+extends Control
+
+
+@onready var icon = $Icon
+@onready var count_label = $CountLabel
+
+var item_id: String = ""
+var count: int = 1
+
+func set_item(id: String, amount: int = 1):
+	item_id = id
+	count = amount
+	
+	var item_data = ItemDB.get_item_data(id)
+	if item_data:
+		var icon_path = "res://Assets/Items/%s.png" % item_data.get("icon", "default")
+		icon.texture = load(icon_path)
+	else:
+		icon.texture = null
+	
+	count_label.text = "x%d" % count if count > 1 else ""
+	
+func set_empty():
+	item_id = ""
+	count = 0
+	var tex = load("res://Assets/Interface/item_slot.png")
+	if icon and tex:
+		icon.texture = tex
+	else:
+		print("DEBUG: icon or texture is null, icon, tex")
+	count_label.text = ""
+
+
+##inventory_ui.gd
+extends Control
+
+
+@onready var player_grid = $VSplitContainer/PlayerSection/PlayerEquipment
+@onready var player_avatar = $VSplitContainer/PlayerSection/PlayerPaperdoll
+@onready var coin_label = $VSplitContainer/PlayerSection/CoinPurse
+@onready var container_grid = $VSplitContainer/ContainerSection/ContainerInventory
+@onready var container_avatar = $VSplitContainer/ContainerSection/ContainerAvatar
+
+var player_inv: Inventory
+var container_inv: Inventory
+var slot_scene = preload("res://Scenes/UI Elements/InventorySlot.tscn")
+
+func open(player_inventory: Inventory, container_inventory: Inventory = null, container_icon: Texture = null):
+	player_inv = player_inventory
+	container_inv = container_inventory
+	refresh()
+	
+	container_grid.get_parent().visible = container_inv != null
+	container_avatar.visible = container_inv != null
+	
+	if container_icon:
+		container_avatar.texture = container_icon
+		
+	show()
+	
+func close():
+	hide()
+	
+func refresh():
+	var coins = player_inv.get_coins()
+	coin_label.text = "Gold: %d" % coins
+	
+	_populate_grid(player_grid, player_inv)
+	if container_inv:
+		_populate_grid(container_grid, container_inv)
+	else:
+		for child in container_grid.get_children():
+			child.queue_free()
+		
+func _populate_grid(grid: GridContainer, inv: Inventory):
+	for child in grid.get_children():
+		child.queue_free()
+	var item_list = inv.get_items()
+	var slot_count = inv.slots
+	
+	for i in range(slot_count):
+		var slot = slot_scene.instantiate()
+		grid.add_child(slot)
+		if i < item_list.size():
+			slot.set_item(item_list[i]["id"], item_list[i]["count"])
+		else:
+			slot.set_empty()
+
+
+##ItemDatabase.gd
+extends Node
+
+
+var item_defs := {}
+var container_defs := {}
+
+func _ready():
+	load_items()
+	load_containers()
+	
+func load_items():
+	var file = FileAccess.open("res://Data/items.yaml", FileAccess.READ)
+	if file:
+		item_defs = YAML.parse(file.get_as_text()).get_data()
+		file.close()
+		
+func load_containers():
+	var file = FileAccess.open("res://Data/containers.yaml", FileAccess.READ)
+	if file:
+		container_defs = YAML.parse(file.get_as_text()).get_data()
+		file.close()
+		
+func get_item_data(id: String) -> Dictionary:
+	return item_defs.get(id, {})
+	
+func get_container_data(id: String) -> Dictionary:
+	return container_defs.get(id, {})
+
+
+##main.gd
+extends Node3D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	GameState.menu_screen = $MenuScreen
+	GameState.minimap = $"UI/2dMinimap"
+	GameState.menu_minimap = $MenuScreen/TabContainer/Map/MenuMinimap 
+	GameState.ui_root = $UI
+	GameState.inventory_ui = $MenuScreen/TabContainer/InventoryTab/InventoryUi
+	GameState.menu_tabs = $MenuScreen/TabContainer
+
+	GameState.minimap.pan_enabled = false
+	GameState.menu_minimap.pan_enabled = true
+
+
+##MapGenerator.gd
+extends Node
+
+func void_platform(radius):
+	var map := []
+	for y in range(radius):
+		var row := []
+		for x in range (radius):
+			row.append(1)
+		map.append(row)
+	return map
+	
+
+func drunken_walk(step_target: int) -> Array:
+	# We'll return a 2D grid with the path marked as 1
+	var map := []
+	var coords := [Vector2i(0, 0)]
+	
+	var x := 0
+	var y := 0
+	var tiles_covered := 0
+	
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	
+	while tiles_covered < step_target - 1:
+		var direction = rng.randi_range(0, 3)
+		match direction:
+			0: y += 1	# north
+			1: x += 1	# east
+			2: y -= 1	# south
+			3: x -= 1	# west
+		
+		var new_coord = Vector2i(x, y)
+		var add_coords = true
+		for c in coords:
+			if c == new_coord:
+				add_coords = false
+				break
+		if add_coords:
+			coords.append(new_coord)
+			tiles_covered += 1
+	
+	# Find min/max for grid sizing
+	var x_vals := coords.map(func(p): return p.x)
+	var y_vals := coords.map(func(p): return p.y)
+	var min_x = x_vals.min()
+	var max_x = x_vals.max()
+	var min_y = y_vals.min()
+	var max_y = y_vals.max()
+	
+	var grid_width = abs(min_x) + abs(max_x) + 3
+	var grid_height = abs(min_y) + abs(max_y) + 3
+	
+	# Initialize grid
+	for y_ in range(grid_height):
+		map.append([])
+		for x_ in range(grid_width):
+			map[y_].append(0)
+	
+	# Offset all points so they fit in the grid
+	for p in coords:
+		var new_x = p.x + abs(min_x) + 1
+		var new_y = p.y + abs(min_y) + 1
+		map[new_y][new_x] = 1
+	
+	return map
+	
+func drunken_forest(step_target: int) -> Array:
+	var base_map = drunken_walk(step_target)
+
+	var height = base_map.size()
+	var width = base_map[0].size()
+	var padded_map = []
+	
+	var row = []
+	row.resize(width + 2)
+	row.fill(0)
+	padded_map.append(row)
+	
+	for y in range(height):
+		var new_row = []
+		new_row.append(0)
+		for x in range(width):
+			new_row.append(base_map[y][x])
+		new_row.append(0)
+		padded_map.append(new_row)
+	
+	var padded_height = padded_map.size()
+	var padded_width = padded_map[0].size()
+	
+	for y in range(padded_height):
+		for x in range(padded_width):
+			if padded_map[y][x] != 0:
+				continue
+				
+			for dy in range(-1, 2):
+				for dx in range(-1, 2):
+					var ny = y + dy
+					var nx = x + dx
+
+					if ny < 0 or ny >= padded_height or nx < 0 or nx >= padded_width:
+						continue
+
+					if padded_map[ny][nx] == 1:
+						padded_map[y][x] = 2
+						break
+
+	return padded_map
+
+
+func simple_maze(width: int, height: int) -> Array:
+	if width % 2 == 0:
+		width += 1
+	if height % 2 == 0:
+		height += 1
+
+	var maze = []
+	for y in range(height):
+		maze.append([])
+		for x in range(width):
+			maze[y].append(0)
+
+	var directions = [Vector2i(0,-2), Vector2i(0,2), Vector2i(2,0), Vector2i(-2,0)]
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+
+	var stack = [Vector2i(1,1)]
+	maze[1][1] = 1
+
+	while stack.size() > 0:
+		var pos = stack.back()
+		directions.shuffle()
+		var carved = false
+
+		for dir in directions:
+			var next_pos = pos + dir
+			if next_pos.x > 0 and next_pos.x < width - 1 and next_pos.y > 0 and next_pos.y < height - 1 and maze[next_pos.y][next_pos.x] == 0:
+				maze[pos.y + dir.y / 2][pos.x + dir.x / 2] = 1
+				maze[next_pos.y][next_pos.x] = 1
+				stack.append(next_pos)
+				carved = true
+				break
+
+		if not carved:
+			stack.pop_back()
+
+	return maze
+
+func roomy_maze(width: int, height: int, room_attempts: int = 10, room_min: int = 3, room_max: int = 7) -> Array:
+	var maze = simple_maze(width, height)
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+
+	for i in range(room_attempts):
+		var room_w = rng.randi_range(room_min, room_max)
+		var room_h = rng.randi_range(room_min, room_max)
+		var room_x = rng.randi_range(1, width - room_w - 2)
+		var room_y = rng.randi_range(1, height - room_h - 2)
+
+		if room_x % 2 == 0:
+			room_x += 1
+		if room_y % 2 == 0:
+			room_y += 1
+
+		for y in range(room_y, room_y + room_h):
+			for x in range(room_x, room_x + room_w):
+				maze[y][x] = 1
+
+	return maze
+
+#########################################
+### 2.0 DUNGEON GENERATOR STARTS HERE ###
+#########################################
+
+var recipe = {
+	"type": "classic",
+	"num_rooms": 8,
+	"room_min_size": 4,
+	"room_max_size": 8,
+	"caves": false,
+	"bsp": true,
+	"corridor_type": "straight",
+	"prefab_rooms": [],
+	"theme": "dungeon"
+	}
+	
+func generate_dungeon(width: int, height: int, recipe_override: Dictionary = {}) -> Array:
+	var cfg = recipe.duplicate()
+	for k in recipe_override.keys():
+		cfg[k] = recipe_override[k]
+		
+	var map = []
+	for y in range(height):
+		var row = []
+		for x in range(width):
+			row.append(0)
+		map.append(row)
+		
+	if cfg["bsp"]:
+		map = generate_bsp_rooms(map, cfg)
+	#if cfg["caves"]:
+		#map = carve_caves(map, cfg)
+			
+	map = carve_corridors(map, cfg)
+	map = place_doors(map, cfg)
+	map = place_entrance_exit(map, cfg)
+	
+	return map
+	
+func generate_bsp_rooms(map: Array, cfg: Dictionary) -> Array:
+	var width = map[0].size()
+	var height = map.size()
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	
+	for i in range (cfg["num_rooms"]):
+		var rw = rng.randi_range(cfg["room_min_size"], cfg["room_max_size"])
+		var rh = rng.randi_range(cfg["room_min_size"], cfg["room_max_size"])
+		var rx = rng.randi_range(1, width - rw - 2)
+		var ry = rng.randi_range(1, height - rh - 2)
+		
+		for y in range(ry, ry + rh):
+			for x in range(rx, rx + rw):
+				map[y][x] = 1
+				
+	return map
+	
+func carve_corridors(map: Array, cfg: Dictionary) -> Array:
+	var width = map[0].size()
+	var height = map.size()
+	var room_centers = []
+	
+	for y in range (1, height - 1):
+		for x in range(1, width - 1):
+			if map[y][x] == 1:
+				if map[y - 1][x] == 1 and map[y + 1][x] == 1 and map[y][x - 1] == 1 and map[y][x + 1] == 1:
+					room_centers.append(Vector2i(x, y))
+					
+	for i in range(room_centers.size() - 1):
+		var a = room_centers[i]
+		var b = room_centers[i + 1]
+		for x in range(min(a.x, b.x), max(a.x, b.x) + 1):
+			map[a.y][x] = 1
+		for y in range(min(a.y, b.y), max(a.y, b.y) + 1):
+			map[y][b.x] = 1
+			
+	return map
+	
+func place_doors(map: Array, cfg: Dictionary) -> Array:
+	var width = map[0].size()
+	var height = map.size()
+	
+	for y in range(1, height - 1):
+		for x in range(1, width - 1):
+			if map[y][x] == 1:
+				if map[y][x - 1] == 1 and map[y][x + 1] == 1 and map[y - 1][x] == 0 and map[y + 1][x] == 0:
+					map[y][x] = 3
+					
+	return map
+	
+func find_entrance_candidates(map):
+	var width = map[0].size()
+	var height = map.size()
+	var candidates = []
+	for y in range(1, height - 1):
+		for x in range(1, width - 1):
+			if map[y][x] == 0:
+				var dirs = [Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0)]
+				for dir in dirs:
+					var nx = x + dir.x
+					var ny = y + dir.y
+					# Ensure adjacent floor isn't on the edge
+					if nx > 0 and nx < width - 1 and ny > 0 and ny < height - 1:
+						if map[ny][nx] == 1:
+							candidates.append({
+								"pos": Vector2i(x, y),
+								"adj": Vector2i(nx, ny),
+								"dir": dir
+							})
+							break
+	return candidates
+	
+func place_entrance_exit(map: Array, cfg: Dictionary) -> Array:
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	var candidates = find_entrance_candidates(map)
+	if candidates.size() == 0:
+		push_error("No valid entrance candidates found.")
+		return map
+	var chosen = candidates[rng.randi_range(0, candidates.size() - 1)]
+	var entrance_pos = chosen["pos"]
+
+	map[entrance_pos.y][entrance_pos.x] = 4 # Mark entrance
+
+	# Gather all floor tiles for possible exits
+	var all_floors = []
+	var width = map[0].size()
+	var height = map.size()
+	for y in range(height):
+		for x in range(width):
+			if map[y][x] == 1:
+				all_floors.append(Vector2i(x, y))
+				
+	# Pick exit far enough from player spawn (e.g., manhattan distance >= threshold)
+	var exit_tile = null
+	var min_dist = 10
+	var attempts = 100
+	while attempts > 0:
+		var candidate = all_floors[rng.randi_range(0, all_floors.size() - 1)]
+		var dist = abs(candidate.x - entrance_pos.x) + abs(candidate.y - entrance_pos.y)
+		if dist >= min_dist:
+			exit_tile = candidate
+			break
+		attempts -= 1
+	# If no distant exit found, just pick any
+	if exit_tile == null and all_floors.size() > 0:
+		exit_tile = all_floors[rng.randi_range(0, all_floors.size() - 1)]
+
+	if exit_tile != null:
+		map[exit_tile.y][exit_tile.x] = 5 # Mark exit
+
+	return map
+
+###############################
+### Final Product Generator ###
+###############################
+
+func generate_map(map_type: String, size: int) -> Array:
+	var map
+	match map_type:
+		"dungeon":
+			map = generate_dungeon(size, size)
+		"forest":
+			map = drunken_forest(size)
+		"maze":
+			map = simple_maze(size, size)
+		"void":
+			map = void_platform(size)
+		_:
+			push_error("Check the requested map type, what the fuck even is a %s??!" % map_type)
+			map = []
+	map = place_entrance_exit(map, {})
+	return map
+		
+
+
+##menu_screen.gd
+extends Control
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+
+
+##MessageBox.gd
+extends CanvasLayer
+
+@onready var log_list: VBoxContainer = $LogBox/TextMargin/ScrollContainer/LogList
+const MAX_LOG_LINES := 7
+const TYPING_SPEED := 0.01 # TODO: Add to options menu
+
+var _message_queue: Array[String] = []
+var _is_typing: bool = false
+
+func say(message: String) -> void:
+	_message_queue.append(message)
+	if not _is_typing:
+		_process_queue()
+	
+func _process_queue() -> void:
+	if _message_queue.size() == 0:
+		_is_typing = false
+		return
+	_is_typing = true
+	var message = _message_queue.pop_front()
+	var label = Label.new()
+	label.text = ""
+	label.modulate = Color.WHITE
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	log_list.add_child(label)
+	log_list.move_child(label, 0)
+	await typing_message(label, message)
+	
+	for i in log_list.get_child_count():
+		var child = log_list.get_child(i)
+		var fade = clamp(1.0 - float(i) * 0.25, 0.2, 1.0)
+		child.modulate.a = fade
+		
+	call_deferred("_cleanup_log_lines")
+	_process_queue()
+	
+func typing_message(label: Label, message: String) -> void:
+	await get_tree().process_frame
+	
+	for i in message.length():
+		label.text = message.substr(0, i + 1)
+		await get_tree().create_timer(TYPING_SPEED).timeout
+		
+func _cleanup_log_lines() -> void:
+	var over_limit := log_list.get_child_count() - MAX_LOG_LINES
+	if over_limit > 0:
+		for i in range(over_limit):
+			var oldest = log_list.get_child(log_list.get_child_count() - 1)
+			if is_instance_valid(oldest):
+				oldest.queue_free()
+
+
+##Minimap.gd
+extends TextureRect
+
+
+@export var tilemap_layer: Node2D
+@export var entities_layer: Node
+
+#@onready var tilemap_layer = $"Node2D/TileMapLayer"
+#@onready var entities_layer = $"Node2D/Entities"
+
+var map_data = []
+var tile_sprites: Dictionary = {}
+var discovered_tiles := {}
+var visible_tiles := {}
+var player_grid_pos = Vector2i.ZERO
+var player_facing: int = 0
+var entity_positions = []
+var base_tile_size = 32
+var tile_size = 32
+var current_zoom := 1.0
+var is_panning := false
+var pan_last_mouse_pos := Vector2.ZERO
+var pan_start_layer_pos := Vector2.ZERO
+var pan_enabled := false
+
+func set_map_data(data):
+	map_data = data
+	
+func set_zoom(factor: float):
+	current_zoom = clamp(factor, 0.25, 1.5)
+	tile_size = base_tile_size * current_zoom
+	
+	for pos in tile_sprites.keys():
+		var sprite = tile_sprites[pos]
+		sprite.scale = Vector2(tile_size, tile_size)
+		sprite.position = Vector2(pos.x * tile_size, pos.y * tile_size)
+		
+	update_entities()
+	center_minimap_on_player()
+	
+func set_player_pos(grid_pos, facing):
+	player_grid_pos = grid_pos
+	player_facing = facing
+	update_entities()
+	center_minimap_on_player()
+	
+func set_entities(entity_list):
+	entity_positions = entity_list
+	update_entities()
+	
+#func refresh_minimap_entities():
+	#var enemies = entity_root.get_children().filter(func(e): return e.is_enemy)
+	#minimap.set_entities(enemies)
+	
+func color_from_list(rgb_array: Array) -> Color:
+	if rgb_array.size() == 3:
+		return Color(rgb_array[0] / 255.0, rgb_array[1] / 255.0, rgb_array[2] / 255.0, 1.0)
+	else:
+		return Color(1, 0, 1) # The Magenta Error
+	
+func draw_minimap():
+	if map_data.is_empty():
+		push_warning("draw_minimap() called but map_data is empty!")
+		return
+	if discovered_tiles.is_empty():
+		push_warning("draw_minimap() called but no discovered tiles!")
+		return
+	for pos in discovered_tiles.keys():
+		var tile_id = map_data[pos.y][pos.x]
+		var tile_info = GlobalTileData.tile_defs.get(str(tile_id), null)
+		if tile_info == null:
+			continue
+
+		var draw_color = color_from_list(tile_info["color"])
+		if not visible_tiles.has(pos):
+			draw_color *= Color(0.4, 0.4, 0.4)
+
+		# Create sprite if it doesn't exist
+		if not tile_sprites.has(pos):
+			var dot = Sprite2D.new()
+			dot.texture = preload("res://Assets/Interface/white_pixel.png")
+			dot.scale = Vector2(tile_size, tile_size)
+			dot.position = Vector2(pos.x * tile_size, pos.y * tile_size)
+			tilemap_layer.add_child(dot)
+			tile_sprites[pos] = dot
+
+		# Update sprite color
+		tile_sprites[pos].modulate = draw_color
+			
+func center_minimap_on_player():
+	#var minimap_size = Vector2(512, 512)
+	var minimap_size = size * 2
+	
+	var center_pixel = minimap_size / 2
+	var player_pixel_pos = Vector2(player_grid_pos.x * tile_size, player_grid_pos.y * tile_size)
+	var offset = center_pixel - player_pixel_pos
+	
+	tilemap_layer.position = offset
+	entities_layer.position = offset
+	
+func mark_tile_visible(grid_pos: Vector2i):
+	discovered_tiles[grid_pos] = true
+	visible_tiles[grid_pos] = true
+	
+func update_entities():
+	for child in entities_layer.get_children():
+		child.queue_free()
+	
+	var player_icon = Sprite2D.new()
+	player_icon.texture = preload("res://Assets/Interface/player.png")
+	player_icon.scale = Vector2(tile_size, tile_size) / base_tile_size
+	player_icon.position = Vector2(player_grid_pos.x * tile_size, player_grid_pos.y * tile_size)
+	# Rotation bandaid:
+	var minimap_facing = player_facing
+	if minimap_facing == 1:
+		minimap_facing = 3
+	elif minimap_facing == 3:
+		minimap_facing = 1
+	player_icon.rotation_degrees = minimap_facing * 90
+	entities_layer.add_child(player_icon)
+	
+	for ent in entity_positions:
+		var icon = Sprite2D.new()
+		icon.texture = preload("res://Assets/Interface/enemy_marker.png")
+		icon.scale = Vector2(tile_size, tile_size) / base_tile_size
+		icon.position = Vector2(ent.x * tile_size, ent.y * tile_size)
+		entities_layer.add_child(icon)
+		
+func _gui_input(event):
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if not pan_enabled:
+				return
+			if event.double_click:
+				center_minimap_on_player()
+				is_panning = false
+				accept_event()
+			if event.pressed:
+				is_panning = true
+				pan_last_mouse_pos = event.position
+				pan_start_layer_pos = tilemap_layer.position
+				accept_event()
+			else:
+				is_panning = false
+				accept_event()
+		elif event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+			set_zoom(current_zoom + 0.25)
+			accept_event()  # Prevents event from propagating to world
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+			set_zoom(current_zoom - 0.25)
+			accept_event()
+	elif event is InputEventMouseMotion and is_panning:
+		var delta = event.position - pan_last_mouse_pos
+		var new_pos = pan_start_layer_pos + delta
+		tilemap_layer.position = new_pos
+		entities_layer.position = new_pos
+		accept_event()
+	
+func reveal_all_tiles():
+	if map_data.is_empty():
+		return
+	for y in range(map_data.size()):
+		for x in range(map_data[y].size()):
+			discovered_tiles[Vector2i(x, y)] = true
+	draw_minimap()
+
+
+##pause_menu.gd
+extends CanvasLayer
+
+
+const TITLE_SCREEN := preload("res://Scenes/UI Elements/TitleScreen.tscn")
+
+func _ready() -> void:
+	var mat := $BlurBG.material as ShaderMaterial
+	mat.set_shader_parameter("screen_size", get_viewport().get_visible_rect().size)
+	print("TITLE_SCREEN is valid:", TITLE_SCREEN)
+	hide()
+	get_tree().paused = false
+	
+	$CenterContainer/VBoxContainer/Resume.pressed.connect(func(): resume())
+	$CenterContainer/VBoxContainer/Title.pressed.connect(func(): call_deferred("return_to_title"))
+	
+func resume():
+	hide()
+	get_tree().paused = false
+	
+func return_to_title():
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://Scenes/UI Elements/TitleScreen.tscn")
+	
+func _unhandled_input(event):
+	if event.is_action_pressed("ui_cancel") and GameState.menu_type == GameState.MenuType.NONE:
+		print("pause pressed")
+		if visible:
+			resume()
+		else:
+			show()
+			get_tree().paused = true
+
+
+##Player.gd
+extends "res://Scripts/EntityBase.gd"
+
+
+## Works, but is wrong?
+var direction_vectors = [
+	Vector2i(0, -1),  # N
+	Vector2i(-1, 0),  # E
+	Vector2i(0, 1),   # S
+	Vector2i(1, 0)    # W
+]
+var minimap: Node = null
+var input_held := false
+var input_direction := Vector2i.ZERO
+var input_repeat_timer := 0.0
+var input_repeat_delay := 0.4
+var input_repeat_rate := 0.1
+var display_name: String = "You"
+var inventory := Inventory.new()
+
+var stats := {
+	"Luck": 5,
+	"Charm": 5,
+	"Wit": 5,
+	"Brawn": 5,
+	"Edge": 5,
+	"Grit": 5
+}
+
+func get_stat(stat_name: String) -> int:
+	return stats.get(stat_name, 0)
+
+func _process(delta):
+	if GameState.menu_type != GameState.MenuType.NONE:
+		return
+	var dir = Vector2i.ZERO
+	
+	if   Input.is_action_pressed("move_forward"):
+		dir = direction_vectors[facing]
+	elif Input.is_action_pressed("move_backward"):
+		dir = direction_vectors[(facing + 2) % 4]
+	elif Input.is_action_pressed("strafe_left"):
+		dir = direction_vectors[(facing + 1) % 4]
+	elif Input.is_action_pressed("strafe_right"):
+		dir = direction_vectors[(facing + 3) % 4]
+		
+	if dir != Vector2i.ZERO:
+		if not input_held:
+			input_held = true
+			input_direction = dir
+			input_repeat_timer = input_repeat_delay
+
+			if not moving:
+				if try_move(dir.x, dir.y):
+					reveal_all_minimaps()
+					update_minimap_pos()
+					world.end_player_turn()
+		else:
+			input_repeat_timer -= delta
+			if input_repeat_timer <= 0:
+				if not moving:
+					if try_move(input_direction.x, input_direction.y):
+						reveal_all_minimaps()
+						update_minimap_pos()
+						world.end_player_turn()
+					input_repeat_timer = input_repeat_rate
+	else:
+		input_held = false
+		input_repeat_timer = 0
+		
+func _unhandled_input(event):
+	if GameState.menu_type != GameState.MenuType.NONE:
+		return
+	if   event.is_action_pressed("turn_left"):
+		turn(1)
+		reveal_all_minimaps()
+	elif event.is_action_pressed("turn_right"):
+		turn(-1)
+		reveal_all_minimaps()
+	elif event.is_action_pressed("attack"):
+		attack()
+	elif event.is_action_pressed("examine"):
+		examine()
+	elif event.is_action_pressed("interact"):
+		interact()
+		
+func reveal_all_minimaps():
+	for mm in [minimap, GameState.menu_minimap]:
+		if mm:
+			reveal_tiles(mm)
+			GameState.menu_minimap.set_player_pos(Vector2i(grid_x, grid_y), facing)
+		
+func attack():
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	var base = rng.randi_range(1, 6) #1d6 damage hardcoded for now, no weapons to calculate from yet.
+	var bonus = get_stat("Brawn") / 2
+	var damage = base + bonus
+	var is_crit = rng.randi_range(1, 100) <= get_stat("Luck") * 2
+	if is_crit:
+		damage *= 2
+		MessageBox.say("Critical hit!")
+	
+	var dir = direction_vectors[facing]
+	var target_x = grid_x + dir.x
+	var target_y = grid_y + dir.y
+	
+	if target_y < 0 or target_y >= map.size() or target_x < 0 or target_x >= map[0].size():
+		print("Attack out of bounds!")
+		return
+		
+	for ent in world.entity_root.get_children():
+		if ent != self and ent.has_method("take_damage") and ent.grid_x == target_x and ent.grid_y == target_y:
+			print("Player attacks ", ent.name, " at ", target_x, ", ", target_y)
+			MessageBox.say("You attack the %s for %d damage!" % [ent.display_name, damage])
+			ent.take_damage(damage)
+			if ent.health <=0:
+				MessageBox.say("The %s is slain!" % ent.display_name)
+			world.end_player_turn()
+			return
+			
+	print("No target to attack.")
+	
+func examine():
+	var dir = direction_vectors[facing]
+	var target_pos = Vector2i(grid_x + dir.x, grid_y + dir.y)
+	
+	for entity in get_tree().get_nodes_in_group("entities"):
+		if entity.grid_x == target_pos.x and entity.grid_y == target_pos.y:
+			print("Found match:", entity.name) 
+			if entity.examine_text != "":
+				MessageBox.say(entity.examine_text)
+				return
+			else:
+				MessageBox.say(entity.display_name)
+				return
+	if target_pos.y >= 0 and target_pos.y < map.size() and target_pos.x >= 0 and target_pos.x < map[0].size():
+		var tile_id = str(map[target_pos.y][target_pos.x])
+		var tile_data = GlobalTileData.tile_defs.get(tile_id, null)
+		if tile_data and tile_data.has("examine"):
+			MessageBox.say(tile_data["examine"])
+			return
+			
+	MessageBox.say("There's nothing there, except for... No, no, there's nothing.")
+	
+func interact():
+	var dir = direction_vectors[facing]
+	var target_pos = Vector2i(grid_x + dir.x, grid_y + dir.y)
+	
+	for entity in get_tree().get_nodes_in_group("entities"):
+		if entity.grid_x == target_pos.x and entity.grid_y == target_pos.y:
+			if entity.has_method("interact"):
+				entity.interact()
+			return
+	MessageBox.say("You see nothing of interest.")
+	
+func get_line(x0: int, y0: int, x1: int, y1: int) -> Array:
+	var line = []
+	var dx = abs(x1 - x0)
+	var dy = -abs(y1 - y0)
+	var sx = 1 if x0 < x1 else -1
+	var sy = 1 if y0 < y1 else -1
+	var err = dx + dy
+	var x = x0
+	var y = y0
+
+	while true:
+		line.append(Vector2i(x, y))
+		if x == x1 and y == y1:
+			break
+		var e2 = 2 * err
+		if e2 >= dy:
+			err += dy
+			x += sx
+		if e2 <= dx:
+			err += dx
+			y += sy
+
+	return line
+
+func reveal_tiles(minimap):
+	minimap.visible_tiles.clear()
+	var vision_range = 6
+	match vision_mode:
+		VisionMode.BLIND: 
+			vision_range = 0
+		VisionMode.DARKVISION: 
+			vision_range = 8
+		VisionMode.TORCH: 
+			vision_range = 4
+		VisionMode.LANTERN: 
+			vision_range = 6
+		VisionMode.BULLSEYE: 
+			vision_range = 8
+		
+
+	var origin = Vector2i(grid_x, grid_y)
+
+	for y in range(grid_y - vision_range, grid_y + vision_range + 1):
+		for x in range(grid_x - vision_range, grid_x + vision_range + 1):
+			var target = Vector2i(x, y)
+
+			if target.x < 0 or target.x >= map[0].size() or target.y < 0 or target.y >= map.size():
+				continue
+
+			if origin.distance_to(target) > vision_range:
+				continue
+
+			if vision_mode == VisionMode.BULLSEYE:
+				var dir = Vector2(direction_vectors[facing]).normalized()
+				var to_tile = Vector2(target - origin).normalized()
+				if dir.dot(to_tile) < 0.7:
+					continue
+
+			for pos in get_line(grid_x, grid_y, x, y):
+				if pos.x < 0 or pos.x >= map[0].size() or pos.y < 0 or pos.y >= map.size():
+					break
+
+				if map[pos.y][pos.x] == 0:
+					minimap.mark_tile_visible(pos)
+					break
+
+				minimap.mark_tile_visible(pos)
+				
+	minimap.draw_minimap()
+
+func update_minimap_pos():
+	minimap.set_player_pos(Vector2i(grid_x, grid_y), facing)
+
+
+##TileBase.gd
+class_name TileBase
+extends Node3D
+
+@export var examine_text := ""
+@export var tile_id: int = -1
+@onready var mesh: MeshInstance3D = null
+@onready var glow_overlay := $GlowOverlay
+var default_material = Material
+
+func _ready() -> void:
+	add_to_group("selectable")
+	mesh = find_mesh_instance(self)
+	if mesh:
+		if mesh.material_override:
+			mesh.material_override = mesh.material_override.duplicate()
+			mesh.material_override.set_shader_parameter("highlight_enabled", false)
+			default_material = mesh.material_override
+		else: push_warning("Mesh has no material_override in tile: " + name)
+	else:
+		push_warning("MeshInstance3D not found in tile: " + name)
+	
+func find_mesh_instance(node: Node) -> MeshInstance3D:
+	for child in node.get_children():
+		if child is MeshInstance3D:
+			return child
+		if child.get_child_count() > 0:
+			var result = find_mesh_instance(child)
+			if result:
+				return result
+	return null
+
+func set_highlight(enabled: bool) -> void:
+	if glow_overlay:
+		glow_overlay.visible = enabled
+		
+func get_examine_text() -> String:
+	if tile_id >= 0:
+		var tile_data = GlobalTileData.tile_defs.get(str(tile_id))
+		if tile_data and tile_data.has("examine"):
+			return tile_data["examine"]
+	return "You are unsure what you are looking at...?"
+
+
+##TileData.gd
+extends Node
+class_name TileRegistry
+
+var tile_defs
+var tile_yaml_path: String = "res://Data/Dungeon_Tiles.yaml"
+
+func load_tiles(path: String = ""):
+	if path != "":
+		tile_yaml_path = path
+		
+	var file = FileAccess.open(tile_yaml_path, FileAccess.READ)
+	if file:
+		var yaml_string = file.get_as_text()
+		var result = YAML.parse(yaml_string)
+		if !result.has_error():
+			tile_defs = result.get_data()
+		else:
+			print("TileData not loaded: %s" % result.get_error())
+	else:
+		push_error("Could not load " + tile_yaml_path)
+
+func _ready():
+	load_tiles()
+
+
+##title_screen.gd
+extends CanvasLayer
+
+const MAIN := preload("res://Scenes/Main.tscn")
+
+
+func _ready():
+	MessageBox.hide()
+	$CenterContainer/VBoxContainer/Start.pressed.connect(_on_start_pressed)
+	$CenterContainer/VBoxContainer/Quit.pressed.connect(_on_quit_pressed)
+	
+func _on_start_pressed():
+	get_tree().change_scene_to_packed(MAIN)
+	
+func _on_quit_pressed():
+	get_tree().quit()
+	
+
+

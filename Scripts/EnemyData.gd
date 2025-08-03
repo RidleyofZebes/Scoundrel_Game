@@ -1,15 +1,16 @@
 extends Node
 class_name EnemyRegistry
 
-var enemy_defs: Dictionary = {}
+var enemy_defs
 
 func _ready():
-	var file = FileAccess.open("res://Data/enemy_types.json", FileAccess.READ)
+	var file = FileAccess.open("res://Data/enemy_types.yaml", FileAccess.READ)
 	if file:
-		var json_string = file.get_as_text()
-		enemy_defs = JSON.parse_string(json_string)
+		var yaml_string = file.get_as_text()
+		var result = YAML.parse(yaml_string)
+		enemy_defs = result.get_data()
 	else:
-		push_error("Could not load enemy_types.json")
+		push_error("Could not load enemy_types.yaml")
 
 func get_random_enemy() -> String:
 	var weighted_pool = []

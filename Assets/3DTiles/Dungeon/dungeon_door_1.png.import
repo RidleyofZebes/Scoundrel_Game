@@ -2,11 +2,14 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dvtjobt7yid1m"
+uid="uid://bet7sconsuoc5"
 path.s3tc="res://.godot/imported/dungeon_door_1.png-6a0752cb6050d4f4a397263cff2a6325.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
+}
+generator_parameters={
+"md5": "c8d6f0866f7b80607b11f71e0b581831"
 }
 
 [deps]

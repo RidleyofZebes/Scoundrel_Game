@@ -6,10 +6,11 @@ extends Node3D
 
 #@onready var tween = $MoveTween
 
-enum VisionMode { BLIND, DARKVISION, TORCH, LANTERN, BULLSEYE}
+enum VisionMode { BLIND, DARKVISION, TORCH, LANTERN, BULLSEYE }
 
 var world: Node = null
 var player: Node3D = null
+var entity_type := 0
 var ui: Node = null
 var grid_x: int
 var grid_y: int
@@ -37,20 +38,28 @@ func _ready():
 func try_move(dx: int, dy: int) -> bool:
 	if moving:
 		return false
-	
+
 	var new_x = grid_x + dx
 	var new_y = grid_y + dy
 	var target_pos = Vector2i(new_x, new_y)
+	
+
+	
 	if new_y < 0 or new_y >= map.size() or new_x < 0 or new_x >= map[0].size():
 		print("can't move to ", new_x, " ", new_y, ", out of bounds!")
 		return false
-	if map[new_y][new_x] != 1:
-		print("can't move!")
+		
+	var tile_data = GlobalTileData.tile_defs.get(str(map[new_y][new_x]), {})
+	
+	if tile_data.isWall == 1 or tile_data.isWall == 2:
+		if self.entity_type == 1:
+			MessageBox.say("You cannot pass through the %s." % tile_data.name)
+		print("The %s blocks %s " % [tile_data.name, self])
 		return false
 	if world.occupied_tiles.has(target_pos):
 		var blocker = world.occupied_tiles[target_pos]
 		if blocker.has_method("is_blocking") and blocker.is_blocking():
-			print("There's a %s blocking the way." % blocker.name)
+			print("The %s blocks %s " % [blocker.name, self])
 			return false
 		
 	var old_pos = Vector2i(grid_x, grid_y)
