@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://mo5oxtcxgn8h"
-path.s3tc="res://.godot/imported/dungeon_stairdown_6.png-f885d972635abdbc28de5f895acea0e3.s3tc.ctex"
+uid="uid://1m4bemijeytg"
+path.s3tc="res://.godot/imported/dungeon_stairdown_10.png-b2e4dd293eb1f9b17972f78acb781d5c.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "482c4ae3230f50c3772ee7f804da895c"
+"md5": "88a48ff2b531de1757528ed53ab9911c"
 }
 
 [deps]
 
-source_file="res://Assets/3DTiles/Dungeon/dungeon_stairdown_6.png"
-dest_files=["res://.godot/imported/dungeon_stairdown_6.png-f885d972635abdbc28de5f895acea0e3.s3tc.ctex"]
+source_file="res://Assets/3DTiles/Dungeon/dungeon_stairdown_10.png"
+dest_files=["res://.godot/imported/dungeon_stairdown_10.png-b2e4dd293eb1f9b17972f78acb781d5c.s3tc.ctex"]
 
 [params]
 

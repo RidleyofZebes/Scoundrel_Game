@@ -63,6 +63,8 @@ func _unhandled_input(event):
 				_debug_reveal_map()
 			KEY_F2:
 				_debug_reveal_entities()
+			KEY_F3:
+				_debug_unlock_doors_chests()
 				
 func _debug_reveal_map():
 	print("#### Map Revealed ####")
@@ -79,6 +81,11 @@ func _debug_reveal_entities():
 		world.reveal_all_entities()
 	if menu_minimap:
 		world.reveal_all_entities()
+
+func _debug_unlock_doors_chests():
+	print("#### Unlocking All Locks ####")
+	MessageBox.say("You feel as if the world has been opened unto you...!")
+	world.unlock_doors_chests()
 		
 func close_all_menus():
 	if open_container_node:

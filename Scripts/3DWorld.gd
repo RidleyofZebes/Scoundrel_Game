@@ -117,6 +117,9 @@ func generate_map():
 					
 				if tile_id == 5: # exit
 					exit_tile = Vector2i(x, y)
+					tile.rotation_degrees.y = random_rotate()
+					tile.grid_x = x
+					tile.grid_y = y
 					
 	if entrance_tile != Vector2i(-1, -1):
 		var dirs = [Vector2i(0,1), Vector2i(1,0), Vector2i(0,-1), Vector2i(-1,0)]
@@ -284,3 +287,9 @@ func reveal_all_entities():
 		minimap.set_entities(all_entity_positions)
 	if GameState.menu_minimap:
 		GameState.menu_minimap.set_entities(all_entity_positions)
+		
+func unlock_doors_chests():
+	for entity in get_tree().get_nodes_in_group("entities"):
+		if entity.is_locked:
+			entity.is_locked = false
+			

@@ -2,14 +2,14 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cowidraleenn3"
+uid="uid://t6ayb01bv0hc"
 path.s3tc="res://.godot/imported/dungeon_stairdown_9.png-b52a466ee2ee0096ab59167258cb1328.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "88a48ff2b531de1757528ed53ab9911c"
+"md5": "bdc67453d3e3c91aaf6fec2731dd3d2a"
 }
 
 [deps]

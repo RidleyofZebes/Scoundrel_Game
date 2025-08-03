@@ -6,6 +6,7 @@ extends Node
 
 var inventory := Inventory.new()
 var is_open := false
+var is_locked := false
 var examine_text := ""
 var display_name := "Chest"
 var grid_x: int = 0

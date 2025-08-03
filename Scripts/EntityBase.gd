@@ -33,7 +33,7 @@ var moving: bool = false
 func _ready():
 	current_rotation_y = rotation_degrees.y
 	print("Entity ready: ", self.name)
-	add_to_group("entities")
+	#add_to_group("mobs") # Not entities
 
 func try_move(dx: int, dy: int) -> bool:
 	if moving:

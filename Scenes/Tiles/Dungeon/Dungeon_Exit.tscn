@@ -1,9 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://bts5o6lnpfdpg"]
+[gd_scene load_steps=4 format=3 uid="uid://bts5o6lnpfdpg"]
 
-[ext_resource type="PackedScene" uid="uid://c2josq6wib67a" path="res://Assets/3DTiles/Dungeon/dungeon_stairdown.gltf" id="1_33ylm"]
+[ext_resource type="PackedScene" uid="uid://dy6toxn5dod34" path="res://Assets/3DTiles/Dungeon/dungeon_stairdown.gltf" id="1_33ylm"]
 [ext_resource type="PackedScene" uid="uid://cfebutne2pe0m" path="res://Scenes/Tiles/_TileBase.tscn" id="1_jl4ty"]
+[ext_resource type="Script" uid="uid://c5thlxo67yf3b" path="res://Scripts/Exit.gd" id="2_4vo7g"]
 
 [node name="Exit" instance=ExtResource("1_jl4ty")]
+script = ExtResource("2_4vo7g")
 
 [node name="blockbench_export" parent="." index="0" instance=ExtResource("1_33ylm")]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+
+[node name="Doors R" parent="blockbench_export/Node" index="9"]
+transform = Transform3D(-1, 8.74228e-08, 0, -8.74228e-08, -1, 0, 0, 0, 1, -0.75, 0.0625, 0)
+
+[node name="Door L" parent="blockbench_export/Node" index="10"]
+transform = Transform3D(-1, -8.74228e-08, 0, 8.74228e-08, -1, 0, 0, 0, 1, 0.75, 0.0625, 0)
+
+[editable path="blockbench_export"]
