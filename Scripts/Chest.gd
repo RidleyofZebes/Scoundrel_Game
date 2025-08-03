@@ -26,7 +26,7 @@ func _ready() -> void:
 		animation_player.play("Close")
 		animation_player.seek(0.0, true)
 	
-func interact():
+func interact(interact_origin: Vector2i):
 	if not is_open:
 		open()
 		
