@@ -6,7 +6,7 @@ extends Node
 
 var inventory := Inventory.new()
 var is_open := false
-var is_locked := false
+var is_locked := true
 var examine_text := ""
 var display_name := "Chest"
 var grid_x: int = 0
@@ -28,8 +28,11 @@ func _ready() -> void:
 		animation_player.seek(0.0, true)
 	
 func interact(interact_origin: Vector2i):
-	if not is_open:
-		open()
+	if is_locked:
+		MessageBox.say("Despite your best efforts, the chest refuses to open. Its lock glints in the dim light defiantly.")
+	else:
+		if not is_open:
+			open()
 		
 func is_blocking() -> bool:
 	return false

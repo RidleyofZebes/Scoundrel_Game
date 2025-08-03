@@ -253,7 +253,6 @@ func place_doors(map: Array, cfg: Dictionary) -> Array:
 		for x in range(1, width - 1):
 			if map[y][x] != 1:
 				continue
-				
 			if map[y][x-1] == 1 and map[y][x+1] == 1 and map[y-1][x] == 0 and map[y+1][x] == 0:
 				if map[y-1][x-1] == 1 or map[y-1][x+1] == 1 or map[y+1][x-1] == 1 or map[y+1][x+1] == 1:
 					map[y][x] = 3

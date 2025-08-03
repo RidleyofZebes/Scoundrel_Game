@@ -69,6 +69,7 @@ func try_move(dx: int, dy: int) -> bool:
 	moving = true
 	start_position = position
 	end_position = Vector3(grid_x, 0, grid_y)
+	check_tile_events()
 	#move_elapsed = 0.0
 	
 	var tween = create_tween()
@@ -79,6 +80,12 @@ func try_move(dx: int, dy: int) -> bool:
 	print("Moving from ", start_position, " to ", end_position)
 
 	return true
+	
+func check_tile_events():
+	for entity in get_tree().get_nodes_in_group("entities"):
+		if entity.grid_x == self.grid_x and entity.grid_y == self.grid_y:
+			if entity.has_method("on_player_enter"):
+				entity.on_player_enter()
 	
 func turn(direction):
 	facing = (facing + direction) % 4

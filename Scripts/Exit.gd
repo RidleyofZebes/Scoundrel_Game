@@ -22,6 +22,9 @@ func _ready() -> void:
 			animation_player.seek(animation_player.current_animation_length, true)
 		else:
 			animation_player.seek(0, true)
+			
+func on_player_enter():
+	MessageBox.say("Venture deeper into the unknown?")
 	
 func interact(interact_origin: Vector2i):
 	var delta = interact_origin - Vector2i(grid_x, grid_y)
