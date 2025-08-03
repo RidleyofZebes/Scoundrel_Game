@@ -153,7 +153,7 @@ func interact():
 	for entity in get_tree().get_nodes_in_group("entities"):
 		if entity.grid_x == target_pos.x and entity.grid_y == target_pos.y:
 			if entity.has_method("interact"):
-				entity.interact()
+				entity.interact(Vector2i(grid_x, grid_y))
 			return
 	MessageBox.say("You see nothing of interest.")
 	
@@ -219,7 +219,10 @@ func reveal_tiles(minimap):
 				if pos.x < 0 or pos.x >= map[0].size() or pos.y < 0 or pos.y >= map.size():
 					break
 
-				if map[pos.y][pos.x] == 0:
+				var tile_id = map[pos.y][pos.x]
+				var tile_data = GlobalTileData.tile_defs.get(str(tile_id), {})
+				
+				if tile_data.isWall == 1 or tile_data.isWall == 3:
 					minimap.mark_tile_visible(pos)
 					break
 
